@@ -260,6 +260,9 @@ input:focus,select:focus,.exc:hover{background:var(--card2)}
 body.ro:before{content:'👁 โหมดดูอย่างเดียว — บัญชีนี้บันทึกข้อมูลไม่ได้';display:block;text-align:center;background:var(--y);color:#2A2000;font-weight:600;padding:6px;font-size:14px}
 body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .card button,body.ro .x,body.ro .tqi{pointer-events:none;opacity:.45}
 @media print{#lock{display:none!important}}
+#rpModal{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.7);overflow:auto;padding:16px;display:grid;place-items:start center}
+#rpModal.hide{display:none}.rpbox{background:var(--card);border-radius:20px;padding:14px;max-width:520px;width:100%}.rpbox img{width:100%;border-radius:12px;display:block}
+@media print{#rpModal{display:none!important}}
 </style>
 </head>
 <body>
@@ -400,7 +403,8 @@ body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .ca
       <div id="dailyBody"></div>
       <label>สรุปโดยโค้ช</label>
       <textarea id="drNote" rows="3" placeholder="สรุปภาพรวมการเทรนวันนี้" oninput="saveDrNote()"></textarea>
-      <button class="ghost" onclick="copyDaily()" style="margin-top:10px">คัดลอกรายงาน</button>
+      <button onclick="makeReport()" style="margin-top:10px">🖼 สร้างรูปรายงานส่งลูกเทรน</button>
+      <button class="ghost" onclick="copyDaily()" style="margin-top:10px">คัดลอกรายงานเป็นข้อความ</button>
     </div>
   </div>
 </section>
@@ -446,6 +450,7 @@ body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .ca
 </section>
 </div>
 
+<div id="rpModal" class="hide"><div class="rpbox"><img id="rpImg" alt="รายงานการฝึก"><div class="chips" style="justify-content:center;margin:12px 0 0"><button onclick="shareReport()">แชร์ให้ลูกเทรน</button><button class="ghost" onclick="saveReport()">บันทึกรูป</button><button class="ghost" onclick="closeReport()">ปิด</button></div></div></div>
 <nav id="bnav"><button data-t="dash" class="on" onclick="tab('dash')"><i><svg viewBox="0 0 24 24"><path d="M5 20v-6M12 20V5M19 20v-9"/></svg></i><span>ภาพรวม</span></button><button data-t="report" onclick="tab('report')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></i><span>รายงาน</span></button><button data-t="train" onclick="tab('train')"><i><svg viewBox="0 0 24 24"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg></i><span>เทรน</span></button><button data-t="body" onclick="tab('body')"><i><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></svg></i><span>วัดตัว</span></button><button data-t="hist" onclick="tab('hist')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></i><span>ประวัติ</span></button><button data-t="client" onclick="tab('client')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></i><span>ลูกค้า</span></button></nav>
 
 <!-- ================= PRINT REPORT DOM CONTAINER ================= -->
@@ -816,8 +821,8 @@ const MUSCLES=Object.keys(EXDB);
 const DESC={};Object.keys(EXOLD).forEach(m=>EXOLD[m].forEach(e=>DESC[e[0]]={mus:m,d:e[1]}));MUSCLES.forEach(m=>EXDB[m].forEach(e=>DESC[e[0]]={mus:m,d:e[1]}));
 
 /* ===== STATE ===== */
-const K='trainerDash_v2';
-let db;try{db=JSON.parse(localStorage.getItem(K)||'null')}catch(e){db=null}
+let K='trainerDash_v2';
+let db;try{let raw=localStorage.getItem(K);if(!raw){for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.indexOf('trainerDash_v2_')===0&&k!=='trainerDash_v2_anon'){raw=localStorage.getItem(k);break;}}}db=JSON.parse(raw||'null')}catch(e){db=null}
 db=db||{clients:[],sessions:[],body:[],cur:null};
 let editing=null, charts={}, curMus=MUSCLES[0];
 const save=()=>{if(window.RO)return;try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}cloudSave();};
@@ -902,6 +907,53 @@ function renderDaily(){
 }
 function setPlan(id,k){const i=curSess().items.find(x=>x.id===id);i.plan=i.plan===k?'':k;save();renderDaily();}
 function saveDrNote(){const s=curSess();if(s){s.report=drNote.value;save();}}
+let RP_BLOB=null;
+async function makeReport(){
+  const s=curSess();if(!s||!s.items.length){alert('ยังไม่มีท่าที่บันทึกวันนี้');return;}
+  const c=C()||{},W=1080,P=48,IW=W-2*P,A='Anuphan, Kanit, sans-serif';
+  try{await Promise.all(['400 28px Anuphan','600 28px Anuphan','700 28px Anuphan','700 28px Kanit'].map(f=>document.fonts.load(f)));}catch(e){}
+  const cv=document.createElement('canvas');cv.width=W;cv.height=8000;const x=cv.getContext('2d');
+  const rr=(a,b,w,h,r,f,sh)=>{x.save();if(sh){x.shadowColor='rgba(70,60,20,.16)';x.shadowBlur=18;x.shadowOffsetY=6;}x.fillStyle=f;x.beginPath();x.roundRect(a,b,w,h,r);x.fill();x.restore();};
+  const T=(t,a,b,f,col,al)=>{x.font=f;x.fillStyle=col;x.textAlign=al||'left';x.textBaseline='alphabetic';x.fillText(t,a,b);};
+  const mw=(t,f)=>{x.font=f;return x.measureText(t).width;};
+  const wrap=(t,w,f)=>{x.font=f;const L=[];String(t).split('\n').forEach(p=>{let l='';for(const ch of p){if(x.measureText(l+ch).width>w){L.push(l);l=ch;}else l+=ch;}L.push(l);});return L;};
+  x.fillStyle='#F6F0DC';x.fillRect(0,0,W,8000);
+  x.fillStyle='#3A3A37';x.fillRect(0,0,W,250);x.fillStyle='#FFC300';x.fillRect(0,250,W,8);
+  T('⚡ BIGGY TRAINER',P,76,'700 38px Kanit, Anuphan','#FFC300');T('DAILY TRAINING REPORT',W-P,76,'600 24px '+A,'#CFCABA','right');
+  T(c.name||'ลูกเทรน',P,166,'700 60px '+A,'#FFFFFF');
+  T('วันที่ '+new Date(s.date+'T00:00:00').toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'}),P,214,'400 28px '+A,'#E9E4D0');
+  const nth=db.sessions.filter(z=>z.cid===db.cur&&z.date<=s.date).length;
+  if(c.total)T('ครั้งที่ '+nth+' / '+c.total,W-P,214,'600 28px '+A,'#FFC300','right');
+  const tv=s.items.reduce((a,i)=>a+vol(i),0),ns=s.items.reduce((a,i)=>a+i.sets.length,0),fc=[0,0,0,0];
+  s.items.forEach(i=>i.sets.forEach(z=>fc[z.f||0]++));const nr=fc[1]+fc[2]+fc[3];
+  const tiles=[['ท่า',s.items.length],['เซ็ต',ns],['Volume (kg)',fmt(tv)],['ฟอร์มดี',nr?Math.round(fc[1]/nr*100)+'%':'—']],tw=(IW-48)/4;
+  tiles.forEach((t,k)=>{const a=P+k*(tw+16);rr(a,292,tw,130,24,k===2?'#FFC300':'#FFFBEF',true);T(String(t[1]),a+tw/2,364,'700 44px '+A,'#2B2A26','center');T(t[0],a+tw/2,404,'400 22px '+A,k===2?'#5A4300':'#7A786F','center');});
+  let y=480;T('สรุปรายท่า',P,y,'700 34px '+A,'#2B2A26');y+=28;
+  const mx=Math.max(1,...s.items.map(vol)),FC={1:'#CDEBC4',2:'#FFE9A8',3:'#FFC7C0'};
+  s.items.forEach(i=>{
+    const sf='600 26px '+A;let px=0,py=0;const pos=i.sets.map((z,k)=>{const lb=(k+1)+'  '+(z.w?z.w+' kg':'BW')+' × '+z.r,w=mw(lb,sf)+40;if(px+w>IW-56){px=0;py++;}const o={lb,w,px,py,f:z.f};px+=w+12;return o;});
+    const rows=py+1,eff=[i.rir?'RIR '+i.rir:'',i.rpe?'RPE '+i.rpe:''].filter(Boolean).join('  •  '),h=148+rows*60+(eff?44:0)+(i.plan?74:0)+14;
+    rr(P,y,IW,h,28,'#FFFBEF',true);
+    T(i.ex,P+28,y+60,'700 34px '+A,'#2B2A26');
+    if(i.tech){const tw2=mw(TN[i.tech],'600 22px '+A)+36;rr(W-P-28-tw2,y+26,tw2,42,21,'#FFC300');T(TN[i.tech],W-P-28-tw2/2,y+55,'600 22px '+A,'#2A2000','center');}
+    T(i.mus||'',P+28,y+98,'400 24px '+A,'#7A786F');T(fmt(vol(i))+' kg',W-P-28,y+98,'600 24px '+A,'#4A4944','right');
+    rr(P+28,y+112,IW-56,12,6,'#ECE6D3');rr(P+28,y+112,Math.max(12,(IW-56)*vol(i)/mx),12,6,'#FFC300');
+    let yy=y+146;
+    pos.forEach(o=>{rr(P+28+o.px,yy+o.py*60,o.w,48,24,FC[o.f]||'#ECE6D3');T(o.lb,P+28+o.px+20,yy+o.py*60+33,sf,'#2B2A26');});
+    yy+=rows*60;
+    if(eff){T(eff,P+28,yy+28,'600 24px '+A,'#7A786F');yy+=44;}
+    if(i.plan){const pt={keep:['＝ แพลนครั้งหน้า: คงน้ำหนักเดิม','#E7DFC6','#4A4944'],up:['▲ แพลนครั้งหน้า: เพิ่มน้ำหนัก','#CDEBC4','#1E5A12'],form:['✎ แพลนครั้งหน้า: แก้ฟอร์ม','#FFD9D3','#8A2A1E']}[i.plan],w=mw(pt[0],'600 26px '+A)+44;rr(P+28,yy+4,w,52,26,pt[1]);T(pt[0],P+50,yy+39,'600 26px '+A,pt[2]);}
+    y+=h+22;});
+  if(s.report){const L=wrap(s.report,IW-90,'400 28px '+A),h=84+L.length*42;rr(P,y,IW,h,28,'#FFFBEF',true);rr(P,y+20,10,h-40,5,'#FFC300');T('สรุปจากโค้ช',P+40,y+56,'700 30px '+A,'#2B2A26');L.forEach((l,k)=>T(l,P+40,y+104+k*42,'400 28px '+A,'#4A4944'));y+=h+22;}
+  y+=14;T('เขียว = ฟอร์มดี   เหลือง = พอใช้   แดง = ต้องแก้ไข',W/2,y,'400 22px '+A,'#8E8C82','center');
+  T('พักผ่อนให้เพียงพอ แล้วเจอกันครั้งหน้า 💪',W/2,y+54,'600 28px '+A,'#4A4944','center');T('Biggy Trainer App',W/2,y+96,'400 22px '+A,'#8E8C82','center');
+  const H=Math.ceil(y+130),out=document.createElement('canvas');out.width=W;out.height=H;out.getContext('2d').drawImage(cv,0,0,W,H,0,0,W,H);
+  out.toBlob(b=>{RP_BLOB=b;rpImg.src=URL.createObjectURL(b);rpModal.classList.remove('hide');},'image/png');}
+function saveReport(){if(!RP_BLOB)return;const s=curSess(),a=document.createElement('a');a.href=URL.createObjectURL(RP_BLOB);a.download='report-'+(s?s.date:today())+'.png';a.click();}
+async function shareReport(){if(!RP_BLOB)return;const c=C()||{},s=curSess(),f=new File([RP_BLOB],'report-'+(s?s.date:today())+'.png',{type:'image/png'});
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'รายงานการฝึก '+(c.name||'')});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  saveReport();}
+function closeReport(){rpModal.classList.add('hide');}
 function copyDaily(){const s=curSess();if(!s)return;const c=C()||{};
   const t='Biggy Trainer — รายงานประจำวัน\nลูกค้า: '+(c.name||'')+'\nวันที่: '+s.date+'\n\n'+s.items.map(i=>'• '+i.ex+': '+i.sets.map(x=>(x.w||'BW')+'×'+x.r+(x.f?'('+FL[x.f]+')':'')).join(', ')+(i.tech?' | '+TN[i.tech]:'')+(i.rir?' | RIR '+i.rir:'')+(i.rpe?' | RPE '+i.rpe:'')+(i.plan?'\n  แพลนครั้งหน้า: '+PL[i.plan]:'')).join('\n')+(s.report?'\n\nสรุป: '+s.report:'');
   try{navigator.clipboard.writeText(t).then(()=>alert('คัดลอกรายงานแล้ว'));}catch(e){}}
@@ -1391,10 +1443,10 @@ async function pushAll(){try{const parts=splitDb();CLown=Date.now();
   CLown=Date.now();setDot('ok');}catch(e){setDot('err');}}
 function adoptDb(n){if(JSON.stringify(n)===JSON.stringify(db))return;db=n;if(!db.cur||!C())db.cur=db.clients[0]?db.clients[0].id:null;try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}render();}
 /* ===== NETLIFY API (central DB via /api/db) ===== */
-const apiH=()=>{let k='';try{k=localStorage.getItem('bt_key')||'';}catch(e){}return k?{'x-app-key':k}:{};};
-async function apiCall(path,opt){opt=opt||{};opt.headers=Object.assign({},apiH(),opt.headers||{});
+async function apiCall(path,opt){opt=opt||{};let k='';try{k=localStorage.getItem('bt_key')||'';}catch(e){}
+  opt.headers=Object.assign(k?{'x-app-key':k}:{},opt.headers||{});
   let r=await fetch('/api/db'+path,opt);
-  if(r.status===401){const k=prompt('กรอกรหัสเข้าใช้งาน (APP_KEY ที่ตั้งไว้บน Netlify)');if(!k)throw new Error('401');try{localStorage.setItem('bt_key',k);}catch(e){}opt.headers=Object.assign({},opt.headers,{'x-app-key':k});r=await fetch('/api/db'+path,opt);}
+  if(r.status===401){const n=prompt('กรอกรหัสเข้าใช้งาน (APP_KEY ที่ตั้งไว้บน Netlify)');if(!n)throw new Error('401');try{localStorage.setItem('bt_key',n);}catch(e){}opt.headers=Object.assign({},opt.headers,{'x-app-key':n});r=await fetch('/api/db'+path,opt);}
   if(!r.ok)throw new Error(r.status);return r;}
 const NET={
   get:async()=>{const o=await (await apiCall('')).json();const docs=Object.keys(o).map(k=>({id:k,data:()=>({j:o[k]})}));return{empty:!docs.length,docs};},
@@ -1404,11 +1456,10 @@ const NET={
   CLcol=NET;setDot('sync');
   const snap=await CLcol.get();let first=false;try{first=!localStorage.getItem('trainerDash_net');}catch(e){}
   if(snap.empty){await pushAll();}
-  else{const r=assembleDb(snap.docs);if(first&&db.clients.length){adoptDb(mergeDb(r,db));await pushAll();}else{adoptDb(r);setDot('ok');}}
-  try{localStorage.setItem('trainerDash_net','1');}catch(e){}
-  setDot('ok');
+  else{const r=assembleDb(snap.docs);if(first&&db.clients.length){adoptDb(mergeDb(r,db));await pushAll();}else adoptDb(r);}
+  try{localStorage.setItem('trainerDash_net','1');}catch(e){}setDot('ok');
   setInterval(async()=>{if(document.hidden||CLtimer||Date.now()-CLown<4000)return;
-    try{const sn=await CLcol.get();const ids=sn.docs.map(d=>d.id);
+    try{const sn=await CLcol.get(),ids=sn.docs.map(d=>d.id);
       const changed=sn.docs.some(d=>CLlast[d.id]!==d.data().j)||Object.keys(CLlast).some(k=>ids.indexOf(k)<0);
       if(changed&&!sn.empty)adoptDb(assembleDb(sn.docs));setDot('ok');}catch(e){setDot('err');}},15000);
 }catch(e){setDot('err');}})();
