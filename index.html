@@ -907,9 +907,9 @@ function renderDaily(){
 }
 function setPlan(id,k){const i=curSess().items.find(x=>x.id===id);i.plan=i.plan===k?'':k;save();renderDaily();}
 function saveDrNote(){const s=curSess();if(s){s.report=drNote.value;save();}}
-let RP_BLOB=null;
-async function makeReport(){
-  const s=curSess();if(!s||!s.items.length){alert('ยังไม่มีท่าที่บันทึกวันนี้');return;}
+let RP_BLOB=null,RP_DATE='';
+async function makeReport(sid){
+  const s=sid?db.sessions.find(z=>z.id===sid):curSess();if(!s||!s.items.length){alert('ยังไม่มีท่าที่บันทึกในเซสชันนี้');return;}RP_DATE=s.date;
   const c=C()||{},W=1080,P=48,IW=W-2*P,A='Anuphan, Kanit, sans-serif';
   try{await Promise.all(['400 28px Anuphan','600 28px Anuphan','700 28px Anuphan','700 28px Kanit'].map(f=>document.fonts.load(f)));}catch(e){}
   const cv=document.createElement('canvas');cv.width=W;cv.height=8000;const x=cv.getContext('2d');
@@ -949,14 +949,14 @@ async function makeReport(){
   T('พักผ่อนให้เพียงพอ แล้วเจอกันครั้งหน้า 💪',W/2,y+54,'600 28px '+A,'#4A4944','center');T('Biggy Trainer App',W/2,y+96,'400 22px '+A,'#8E8C82','center');
   const H=Math.ceil(y+130),out=document.createElement('canvas');out.width=W;out.height=H;out.getContext('2d').drawImage(cv,0,0,W,H,0,0,W,H);
   out.toBlob(b=>{RP_BLOB=b;rpImg.src=URL.createObjectURL(b);rpModal.classList.remove('hide');},'image/png');}
-function saveReport(){if(!RP_BLOB)return;const s=curSess(),a=document.createElement('a');a.href=URL.createObjectURL(RP_BLOB);a.download='report-'+(s?s.date:today())+'.png';a.click();}
-async function shareReport(){if(!RP_BLOB)return;const c=C()||{},s=curSess(),f=new File([RP_BLOB],'report-'+(s?s.date:today())+'.png',{type:'image/png'});
+function saveReport(){if(!RP_BLOB)return;const s=curSess(),a=document.createElement('a');a.href=URL.createObjectURL(RP_BLOB);a.download='report-'+(RP_DATE||today())+'.png';a.click();}
+async function shareReport(){if(!RP_BLOB)return;const c=C()||{},s=curSess(),f=new File([RP_BLOB],'report-'+(RP_DATE||today())+'.png',{type:'image/png'});
   try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'รายงานการฝึก '+(c.name||'')});return;}}catch(e){if(e&&e.name==='AbortError')return;}
   saveReport();}
 function closeReport(){rpModal.classList.add('hide');}
-function copyDaily(){const s=curSess();if(!s)return;const c=C()||{};
+function copyDaily(sid){const s=sid?db.sessions.find(z=>z.id===sid):curSess();if(!s)return;const c=C()||{};
   const t='Biggy Trainer — รายงานประจำวัน\nลูกค้า: '+(c.name||'')+'\nวันที่: '+s.date+'\n\n'+s.items.map(i=>'• '+i.ex+': '+i.sets.map(x=>(x.w||'BW')+'×'+x.r+(x.f?'('+FL[x.f]+')':'')).join(', ')+(i.tech?' | '+TN[i.tech]:'')+(i.rir?' | RIR '+i.rir:'')+(i.rpe?' | RPE '+i.rpe:'')+(i.plan?'\n  แพลนครั้งหน้า: '+PL[i.plan]:'')).join('\n')+(s.report?'\n\nสรุป: '+s.report:'');
-  try{navigator.clipboard.writeText(t).then(()=>alert('คัดลอกรายงานแล้ว'));}catch(e){}}
+  try{navigator.clipboard.writeText(t).then(()=>alert('คัดลอกรายงานแล้ว'),()=>prompt('คัดลอกข้อความรายงาน',t));}catch(e){prompt('คัดลอกข้อความรายงาน',t);}}
 /* ===== TEMPLATE EDIT ===== */
 let editTplId=null;
 function editTpl(){const t=tpls().find(x=>x.id===curTpl);if(!t)return;if(tplMode)toggleTplMode();toggleTplMode();tplDraft=t.items.slice();tplName.value=t.name;editTplId=t.id;btnTplMode.textContent='✕ ยกเลิกการแก้ไข';renderDraft();tplBuilder.scrollIntoView({behavior:'smooth',block:'center'});}
@@ -1061,7 +1061,7 @@ function render(){
 
   bodyBody.innerHTML=bb.slice().reverse().map(b=>'<tr><td>'+b.date+'</td><td>'+(b.w||'–')+'</td><td>'+(b.bf||'–')+'</td><td>'+(b.mm||'–')+'</td><td>'+(b.chest||'–')+'</td><td>'+(b.waist||'–')+'</td><td>'+(b.hip||'–')+'</td><td>'+(b.arm||'–')+'</td><td>'+(b.thigh||'–')+'</td><td><div class="x" onclick="delBody(\''+b.id+'\')">×</div></td></tr>').join('')||'<tr><td colspan="10" class="empty">ยังไม่มีข้อมูล</td></tr>';
 
-  histBody.innerHTML=ss.slice().reverse().map(s=>'<div style="border-bottom:1px solid var(--line2);padding:16px 0"><b style="font-family:var(--fh);font-size:17px">'+s.date+'</b> <span class="pill">'+(s.focus||'Session')+'</span> <span class="sub">Volume '+fmt(s.items.reduce((a,i)=>a+vol(i),0))+' kg</span><table style="margin-top:10px"><tbody>'+s.items.map(i=>'<tr><td style="width:28%"><b>'+i.ex+'</b> <span class="x" style="display:inline-block;padding:2px 8px" onclick="renameItem(\''+s.id+'\',\''+i.id+'\')">✎</span> <span class="sub">('+i.mus+')</span></td><td>'+i.sets.map(x=>(x.w?x.w+'kg':'BW')+' × '+x.r+(x.f?['','✅','🟡','🔴'][x.f]:'')).join('  |  ')+'</td><td style="width:14%">'+fmt(vol(i))+' kg</td><td class="sub">'+(i.tech?TN[i.tech]+' ':'')+(i.plan?'→ '+PL[i.plan]+' ':'')+(i.rir?'RIR '+i.rir+' ':'')+(i.rpe?'RPE '+i.rpe+' ':'')+(i.note||'')+(i.by?' · '+i.by:'')+'</td></tr>').join('')+'</tbody></table></div>').join('')||'<div class="empty">ยังไม่มีประวัติการเทรน</div>';
+  histBody.innerHTML=ss.slice().reverse().map(s=>'<div style="border-bottom:1px solid var(--line2);padding:16px 0"><b style="font-family:var(--fh);font-size:17px">'+s.date+'</b> <span class="pill">'+(s.focus||'Session')+'</span> <span class="sub">Volume '+fmt(s.items.reduce((a,i)=>a+vol(i),0))+' kg</span><div class="chips" style="margin:10px 0 0"><button class="ghost" onclick="copyDaily(\''+s.id+'\')">📋 รายงานข้อความ</button><button onclick="makeReport(\''+s.id+'\')">🖼 รายงานรูปภาพ</button></div><table style="margin-top:10px"><tbody>'+s.items.map(i=>'<tr><td style="width:28%"><b>'+i.ex+'</b> <span class="x" style="display:inline-block;padding:2px 8px" onclick="renameItem(\''+s.id+'\',\''+i.id+'\')">✎</span> <span class="sub">('+i.mus+')</span></td><td>'+i.sets.map(x=>(x.w?x.w+'kg':'BW')+' × '+x.r+(x.f?['','✅','🟡','🔴'][x.f]:'')).join('  |  ')+'</td><td style="width:14%">'+fmt(vol(i))+' kg</td><td class="sub">'+(i.tech?TN[i.tech]+' ':'')+(i.plan?'→ '+PL[i.plan]+' ':'')+(i.rir?'RIR '+i.rir+' ':'')+(i.rpe?'RPE '+i.rpe+' ':'')+(i.note||'')+(i.by?' · '+i.by:'')+'</td></tr>').join('')+'</tbody></table></div>').join('')||'<div class="empty">ยังไม่มีประวัติการเทรน</div>';
 
   const exs={};
   ss.forEach(s=>s.items.forEach(i=>{const o=exs[i.ex]=exs[i.ex]||{mus:i.mus,max:0,orm:0,vol:0,last:'',pts:[]};
