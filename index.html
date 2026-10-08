@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Biggy Trainer App</title>
+<meta name="theme-color" content="#3A3A37">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Biggy Trainer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Kanit:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+ --bg:#FAF7F0; --bg2:#F4F0E6; --card:#FFFFFF; --card2:#FBF8F1;
+ --line:#E4DFD2; --line2:#EFEBE0;
+ --txt:#23252A; --sub:#6B6E76; --dim:#9A9DA5;
+ --y:#FFC300; --y2:#E8A200; --y3:#FFF3C4; --y-soft:#FFF8DE; --y-txt:#8A6A00;
+ --red:#E5484D; --ok:#5C9E31;
+ --sh:0 1px 3px rgba(60,50,20,.06),0 6px 18px rgba(60,50,20,.05);
+ --f:'Anuphan',system-ui,-apple-system,sans-serif;
+ --fh:'Kanit',var(--f);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:var(--f);font-size:17px;font-weight:400;-webkit-font-smoothing:antialiased;line-height:1.55}
+header{background:#fff;border-bottom:3px solid var(--y);padding:16px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+h1{font-family:var(--fh);font-size:24px;font-weight:700;letter-spacing:.5px;color:var(--y2);text-transform:uppercase}
+h1 span{color:var(--txt)}
+.sub{color:var(--sub);font-size:14.5px;font-weight:300}
+.wrap{max-width:1480px;margin:0 auto;padding:24px}
+.grid{display:grid;gap:18px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--sh)}
+.card h2{font-family:var(--fh);font-size:16px;font-weight:600;margin-bottom:16px;color:var(--y-txt);letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card h2:before{content:'';width:4px;height:18px;background:var(--y);border-radius:2px}
+.kpi{position:relative;overflow:hidden}
+.kpi:after{content:'';position:absolute;right:-34px;top:-34px;width:100px;height:100px;background:var(--y);opacity:.12;border-radius:50%}
+.kpi .v{font-family:var(--fh);font-size:38px;font-weight:700;margin:8px 0;color:var(--txt);line-height:1.1}
+.kpi .l{color:var(--sub);font-size:14px;font-weight:300}
+label{display:block;color:var(--sub);font-size:13.5px;font-weight:400;margin-bottom:6px}
+input,select,textarea{width:100%;background:var(--bg2);border:1.5px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 13px;font-size:16px;font-family:var(--f)}
+input::placeholder{color:var(--dim)}
+input:focus,select:focus{outline:none;background:#fff;border-color:var(--y2);box-shadow:0 0 0 4px rgba(255,195,0,.18)}
+.row{display:grid;gap:12px;margin-bottom:13px}
+.r2{grid-template-columns:1fr 1fr}.r3{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(4,1fr)}
+button{background:var(--y);color:#2A2000;border:0;border-radius:10px;padding:12px 20px;font-weight:600;cursor:pointer;font-size:16px;font-family:var(--fh);letter-spacing:.3px;transition:.15s;box-shadow:0 2px 6px rgba(232,162,0,.28)}
+button:hover{background:var(--y2);color:#fff;transform:translateY(-1px)}
+button.ghost{background:#fff;border:1.5px solid var(--line);color:var(--sub);font-weight:400;box-shadow:none}
+button.ghost:hover{border-color:var(--y2);color:var(--y-txt);background:var(--y-soft);transform:none}
+button.red{background:var(--red);color:#fff;box-shadow:none}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{text-align:left;color:var(--dim);font-weight:500;font-size:13px;padding:11px 9px;border-bottom:2px solid var(--line);text-transform:uppercase;letter-spacing:.5px}
+td{padding:12px 9px;border-bottom:1px solid var(--line2)}
+tr:hover td{background:var(--y-soft)}
+.tabs{display:flex;gap:9px;margin-bottom:22px;flex-wrap:wrap}
+.tab{padding:11px 22px;border-radius:11px;background:#fff;border:1.5px solid var(--line);cursor:pointer;font-size:16px;font-family:var(--fh);font-weight:500;transition:.15s}
+.tab:hover{border-color:var(--y2);color:var(--y-txt)}
+.tab.on{background:var(--y);color:#2A2000;font-weight:600;border-color:var(--y);box-shadow:0 2px 8px rgba(232,162,0,.3)}
+.hide{display:none}
+.pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:13.5px;background:var(--y3);color:var(--y-txt);font-weight:600}
+.up{color:var(--ok);font-weight:500}.down{color:var(--red);font-weight:500}
+.setrow{display:grid;grid-template-columns:34px 1fr 1fr 42px;gap:10px;align-items:center;margin-bottom:9px}
+.setrow>span{color:var(--y-txt);font-size:15px;font-weight:600;text-align:center;font-family:var(--fh)}
+.x{background:var(--bg2);color:var(--red);border-radius:8px;padding:10px 0;text-align:center;cursor:pointer;font-weight:700;font-size:16px;border:1px solid var(--line)}
+.x:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.bar{height:9px;background:var(--bg2);border-radius:5px;overflow:hidden;margin-top:11px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--y2),var(--y));transition:.4s}
+canvas{max-height:300px}
+.empty{color:var(--dim);text-align:center;padding:36px;font-size:15.5px;font-weight:300}
+.mgroup{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+.mg{padding:9px 19px;border-radius:22px;background:#fff;border:1.5px solid var(--line);cursor:pointer;font-size:15.5px;font-family:var(--fh);font-weight:500;transition:.15s}
+.mg:hover{border-color:var(--y2);color:var(--y-txt);background:var(--y-soft)}
+.mg.on{background:var(--y);color:#2A2000;border-color:var(--y);box-shadow:0 2px 8px rgba(232,162,0,.3)}
+.mg b{opacity:.55;font-weight:400;font-size:13px}
+.exgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:11px;max-height:380px;overflow-y:auto;padding-right:8px}
+.exgrid::-webkit-scrollbar{width:8px}.exgrid::-webkit-scrollbar-track{background:var(--bg2);border-radius:4px}.exgrid::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.exc{background:var(--bg2);border:1.5px solid var(--line);border-left:4px solid var(--line);border-radius:11px;padding:13px 15px;cursor:pointer;transition:.15s}
+.exc:hover{border-color:var(--y2);border-left-color:var(--y2);background:#fff;transform:translateX(3px);box-shadow:var(--sh)}
+.exc.sel{border-color:var(--y2);border-left-color:var(--y2);background:var(--y-soft)}
+.exc .n{font-weight:600;font-size:15.5px;margin-bottom:4px;font-family:var(--fh);color:var(--txt)}
+.exc .d{color:var(--sub);font-size:13.5px;font-weight:300;line-height:1.5}
+.hint{background:var(--y-soft);border-left:4px solid var(--y);border-radius:0 10px 10px 0;padding:12px 15px;font-size:14.5px;color:var(--y-txt);margin-bottom:14px;font-weight:400;line-height:1.55}
+/* ===== REST TIMER ===== */
+.timerwrap{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.ring{width:190px;height:190px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--y) var(--p,0%),var(--bg2) 0);transition:background .2s linear}
+.ring:before{content:'';position:absolute;inset:13px;background:#fff;border-radius:50%;box-shadow:inset 0 2px 8px rgba(60,50,20,.08)}
+.ring .t{position:relative;font-family:var(--fh);font-size:46px;font-weight:700;letter-spacing:1px;line-height:1}
+.ring .s{position:relative;font-size:13.5px;color:var(--sub);margin-top:2px;font-weight:400}
+.ring.warn{animation:pulse .5s infinite}
+.ring.done{background:var(--red)!important;animation:shake .35s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tcol{flex:1;min-width:min(100%,290px)}
+.presets{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.ps{padding:13px 20px;border-radius:12px;background:#fff;border:2px solid var(--line);cursor:pointer;
+  font-family:var(--fh);font-weight:600;font-size:17px;transition:.15s;min-width:88px;text-align:center}
+.ps:hover{border-color:var(--y2);background:var(--y-soft);color:var(--y-txt)}
+.ps.on{background:var(--y);border-color:var(--y);color:#2A2000;box-shadow:0 3px 10px rgba(232,162,0,.35)}
+.ps small{display:block;font-size:12px;font-weight:400;opacity:.65;margin-top:1px}
+.tctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tbig{font-size:18px;padding:14px 32px}
+.vol{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;color:var(--sub);flex-wrap:wrap}
+.vol input[type=range]{width:150px;accent-color:var(--y2);padding:0;background:none;border:0}
+.alarmbtn{background:var(--red)!important;color:#fff!important;animation:pulse .5s infinite}
+body.flash{animation:fl .4s infinite}
+@keyframes fl{0%,100%{background:var(--bg)}50%{background:#FFF0B8}}
+
+/* ===== PRINT REPORT STYLES ===== */
+#printReportArea{display:none}
+@media print{
+  header,.tabs,button,.noprint,.exgrid,.mgroup,#exSearch,#timerCard,#p-dash,#p-train,#p-body,#p-hist,#p-client{display:none!important}
+  body{background:#fff;color:#000;font-size:14px;line-height:1.4}
+  #printReportArea{display:block!important;padding:10px 20px}
+  .print-page{page-break-after:always}
+  .print-header{border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end}
+  .print-header h2{font-family:var(--fh);font-size:22px;color:#000}
+  .print-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:20px;font-size:13.5px}
+  .print-card{border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:16px;break-inside:avoid}
+  .print-card h3{font-family:var(--fh);font-size:15px;margin-bottom:10px;color:#111;border-bottom:1px solid #eee;padding-bottom:5px}
+  .print-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+}
+
+/* ===== RESPONSIVE (phone / iPad) ===== */
+html{-webkit-text-size-adjust:100%}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+button,.tab,.mg,.ps,.exc,.x{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.row>div,.setrow>*{min-width:0}
+input[type=date]{min-height:46px}
+.hsel{min-width:210px}.hbtns{margin-left:auto;display:flex;gap:9px}.ico{display:none}
+canvas.c-rep{max-height:340px}
+@media (hover:none){button:hover,.exc:hover{transform:none}}
+@media screen and (max-width:1024px){
+ header{padding:12px 18px}.wrap{padding:18px}
+ .x{padding:12px 0;min-width:44px}
+}
+@media screen and (max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}}
+@media screen and (max-height:500px){header{position:static}}
+@media screen and (max-width:600px){
+ body{font-size:16px}
+ header{position:static;padding:10px 12px;gap:8px 10px}
+ h1{font-size:19px;flex:1}
+ .hbtns{margin-left:0;gap:6px}
+ .hbtns button{padding:0;width:44px;height:44px;font-size:18px}
+ .hbtns .lbl{display:none}.hbtns .ico{display:inline}
+ .hsel{min-width:0;flex:1 1 100%}
+ #clientInfo{flex:1 1 100%;font-size:13px}
+ .wrap{padding:12px}
+ .tabs{position:sticky;top:0;z-index:40;background:var(--bg);flex-wrap:nowrap;overflow-x:auto;margin:0 -12px 12px;padding:8px 12px;gap:7px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .tabs::-webkit-scrollbar{display:none}
+ .tab{flex:0 0 auto;white-space:nowrap;padding:10px 15px;font-size:15px}
+ .grid{gap:12px}
+ .card{padding:16px;border-radius:14px}
+ .card h2{font-size:15px}
+ .kpi{padding:14px}.kpi .v{font-size:27px}.kpi .l{font-size:12.5px}
+ .r3,.r4{grid-template-columns:1fr 1fr}
+ .card table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:15px}
+ th,td{white-space:nowrap;padding:10px 8px}
+ #todayBody td:first-child{white-space:normal;min-width:150px}
+ #histBody table,#histBody tbody{display:block;overflow:visible}
+ #histBody tr{display:block;padding:8px 0;border-bottom:1px dashed var(--line)}
+ #histBody td{display:block;width:auto!important;white-space:normal;border:0;padding:2px 0}
+ .mgroup{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px 14px;padding:2px 16px;scrollbar-width:none}
+ .mgroup::-webkit-scrollbar{display:none}
+ .mg{flex:0 0 auto;white-space:nowrap}
+ .exgrid{max-height:52vh;padding-right:4px}
+ .timerwrap{justify-content:center;gap:16px}
+ .ring{width:min(210px,62vw);height:min(210px,62vw)}
+ .ring .t{font-size:clamp(38px,12vw,50px)}
+ .tcol{flex:1 1 100%}
+ .presets{display:grid;grid-template-columns:repeat(3,1fr)}
+ .ps{min-width:0;padding:11px 6px}
+ .tctrl{display:grid;grid-template-columns:1fr 1fr}
+ .tctrl .tbig{grid-column:1/-1;padding:16px}
+ .vol input[type=range]{flex:1;width:auto;min-width:120px}
+ .vol>span{margin-left:0!important;flex:1 1 100%}
+ .setrow{grid-template-columns:26px 1fr 1fr 46px;gap:8px}
+ canvas{max-height:none}
+ canvas.c-rep{max-height:none}
+}
+
+/* ===== APP-STYLE UI (phone / iPad) ===== */
+#bnav{display:none}
+section:not(.hide){animation:sIn .28s ease}
+@keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+html{overscroll-behavior-y:none}
+@media print{#bnav{display:none!important}}
+@media screen and (max-width:1024px){
+ body{user-select:none;-webkit-user-select:none}
+ input,textarea{user-select:text;-webkit-user-select:text}
+ header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 14px 10px;box-shadow:none}
+ .tabs{display:none}
+ .wrap{padding:14px 14px calc(96px + env(safe-area-inset-bottom))}
+ .card{border:0;border-radius:20px;box-shadow:0 2px 12px rgba(60,50,20,.08)}
+ input,select,textarea{border-radius:14px;min-height:48px}
+ button{border-radius:14px;min-height:46px}
+ #bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;justify-content:space-around;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+ #bnav button{flex:1;min-height:0;padding:4px 2px;background:none;box-shadow:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:2px;font:500 11.5px var(--f);border-radius:12px;transform:none!important}
+ #bnav i{font-style:normal;font-size:22px;line-height:1;padding:4px 16px;border-radius:14px;transition:.2s}
+ #bnav button.on{color:var(--y-txt);font-weight:600}
+ #bnav button.on i{background:var(--y3)}
+}
+@media screen and (min-width:601px) and (max-width:1024px){
+ #bnav{left:50%;right:auto;width:min(560px,94vw);transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));border:1px solid var(--line);border-radius:26px;box-shadow:0 8px 28px rgba(60,50,20,.18);padding-bottom:6px}
+ #bnav button{font-size:13px}
+}
+@media screen and (max-width:600px){.card>button{width:100%}}
+@media screen and (max-height:500px){header{position:static}}
+
+/* ===== BIGGY DARK FITNESS THEME ===== */
+:root{color-scheme:light;--bg:#F6F0DC;--bg2:#ECE6D3;--card:#FFFBEF;--card2:#FAF4E3;--line:#DDD5BE;--line2:#E6DFC9;--txt:#2B2A26;--sub:#5F5E57;--dim:#8E8C82;--y:#FFC300;--y2:#E8A200;--y-soft:rgba(255,195,0,.13);--y3:rgba(255,195,0,.26);--y-txt:#8A6200;--sh:0 2px 14px rgba(70,60,20,.10)}
+header{background:rgba(58,58,55,.97);border-bottom:2px solid var(--y)}
+h1{color:var(--y)}h1 span{color:#fff}
+header select{background:#4A4A46;color:#fff;border-color:#5C5C57}
+header .sub{color:#B9BCC4}
+header button.ghost{background:transparent;color:#DADCE2;border-color:#76766F}
+#bnav{background:rgba(255,251,239,.96);border-color:#E2D8B8}
+.tab,.mg,.ps,button.ghost{background:var(--card)}
+input:focus,select:focus,.exc:hover{background:var(--card2)}
+.ring:before{background:var(--card)}
+#p-dash .kpi:first-child{background:linear-gradient(135deg,#FFC300,#E8A200)}
+#p-dash .kpi:first-child .v,#p-dash .kpi:first-child .l{color:#2A2000}
+#p-dash .kpi:first-child .bar{background:rgba(0,0,0,.2)}#p-dash .kpi:first-child .bar i{background:#2A2000}
+/* chips, rollers, templates */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.chip{min-width:44px;height:44px;padding:0 10px;display:grid;place-items:center;border-radius:12px;background:var(--bg2);border:1.5px solid var(--line);font:600 16px var(--fh);cursor:pointer;user-select:none;touch-action:manipulation}
+.chip.on{background:var(--y);border-color:var(--y);color:#2A2000;box-shadow:0 2px 10px rgba(255,195,0,.3)}
+.chips select{width:auto;min-height:44px;padding:0 8px;border-radius:12px}
+.setrow2{display:grid;grid-template-columns:120px 1fr;gap:10px 14px;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px}
+.setrow2 .sh{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;font-family:var(--fh);color:var(--y-txt)}
+.setrow2 .sw,.setrow2 .sr{min-width:0}
+.rw{position:relative;border-radius:14px;background:var(--bg2);border:1.5px solid var(--line);overflow:hidden}
+.rw:before{content:'';position:absolute;left:0;right:0;top:44px;height:44px;background:rgba(255,195,0,.14);border-top:2px solid var(--y);border-bottom:2px solid var(--y);pointer-events:none;z-index:1}
+.roller{height:132px;overflow-y:auto;scroll-snap-type:y mandatory;padding:44px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.roller::-webkit-scrollbar{display:none}
+.roller div{height:44px;line-height:44px;text-align:center;scroll-snap-align:center;font:600 22px var(--fh);color:var(--txt)}
+.tqi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;margin-bottom:8px;border-radius:12px;background:var(--bg2);border:1.5px solid var(--line);cursor:pointer;font-family:var(--fh);font-weight:500}
+.tqi.done{opacity:.55;border-color:var(--ok)}
+.tqi small{color:var(--dim);font-weight:300}
+
+/* ===== v10 ===== */
+.setrow2{grid-template-columns:1fr 1fr}.setrow2 .sr{grid-column:1/-1}
+.chip.f1.on{background:#7BC96F;border-color:#7BC96F;color:#10300B}.chip.f2.on{background:#FFD23F;border-color:#FFD23F;color:#3A2C00}.chip.f3.on{background:#FF5A4D;border-color:#FF5A4D;color:#fff}
+.chip.pl{padding:0 14px;font-size:15px}
+.ft{display:inline-block;margin:3px 6px 3px 0;padding:4px 10px;border-radius:10px;background:var(--bg2);font-size:14px}
+.ft.f1{background:rgba(123,201,111,.35)}.ft.f2{background:rgba(255,210,63,.4)}.ft.f3{background:rgba(255,90,77,.28)}
+#bnav i{padding:5px 18px}
+#bnav i svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;display:block}
+.sd{display:inline-block;width:9px;height:9px;border-radius:50%;background:#8E8C82;margin-left:8px;vertical-align:middle}.sd.ok{background:#7BC96F}.sd.sync{background:#FFC300}.sd.err{background:#FF5A4D}
+#lock{position:fixed;inset:0;z-index:999;background:linear-gradient(160deg,#4A4A46,#2B2A26);display:grid;place-items:center;padding:24px}
+#lock.hide{display:none}
+.lk{width:min(380px,100%);background:var(--card);border-radius:24px;padding:28px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lkLogo{font-size:46px}.lk h2{font-family:var(--fh);letter-spacing:.12em;margin:4px 0 16px}
+.lk .av{width:68px;height:68px;border-radius:50%;margin:8px auto 10px;display:grid;place-items:center;background:var(--y);font:700 28px var(--fh);color:#2A2000}
+.lk button{width:100%;margin-top:12px}
+body.ro:before{content:'👁 โหมดดูอย่างเดียว — บัญชีนี้บันทึกข้อมูลไม่ได้';display:block;text-align:center;background:var(--y);color:#2A2000;font-weight:600;padding:6px;font-size:14px}
+body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .card button,body.ro .x,body.ro .tqi{pointer-events:none;opacity:.45}
+@media print{#lock{display:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ BIGGY <span>TRAINER</span><i id="syncDot" class="sd off"></i></h1>
+  <div class="hsel"><select id="clientSel" onchange="switchClient(this.value)"></select></div>
+  <div class="sub" id="clientInfo"></div>
+  <div class="hbtns">
+    <button class="ghost" title="Export" onclick="exportJSON()"><span class="ico">⬇️</span><span class="lbl">Export</span></button>
+    <button class="ghost" title="Import" onclick="document.getElementById('imp').click()"><span class="ico">⬆️</span><span class="lbl">Import</span></button>
+    <input type="file" id="imp" class="hide" accept=".json" onchange="importJSON(this)">
+    <button title="พิมพ์รายงาน" onclick="triggerPrint()">🖨️<span class="lbl"> พิมพ์รายงาน</span></button>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="tabs">
+  <div class="tab on" data-t="dash" onclick="tab('dash')">ภาพรวม</div>
+  <div class="tab" data-t="report" onclick="tab('report')">🎯 รายงานสรุปคอร์ส</div>
+  <div class="tab" data-t="train" onclick="tab('train')">บันทึกเทรน</div>
+  <div class="tab" data-t="body" onclick="tab('body')">วัดร่างกาย</div>
+  <div class="tab" data-t="hist" onclick="tab('hist')">ประวัติ</div>
+  <div class="tab" data-t="client" onclick="tab('client')">ลูกค้า</div>
+</div>
+
+<!-- DASHBOARD -->
+<section id="p-dash">
+  <div class="grid g4" style="margin-bottom:18px">
+    <div class="card kpi"><div class="l">เซสชันที่เทรนแล้ว</div><div class="v" id="kSess">0</div><div class="bar"><i id="kBar" style="width:0%"></i></div><div class="l" id="kLeft" style="margin-top:8px"></div></div>
+    <div class="card kpi"><div class="l">Volume รวม (kg)</div><div class="v" id="kVol">0</div><div class="l">น้ำหนัก × ครั้ง สะสมทั้งคอร์ส</div></div>
+    <div class="card kpi"><div class="l">น้ำหนักตัวล่าสุด</div><div class="v" id="kBW">–</div><div class="l" id="kBWd"></div></div>
+    <div class="card kpi"><div class="l">% ไขมัน / BMI</div><div class="v" id="kBF">–</div><div class="l" id="kBFd"></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h2>น้ำหนักตัว &amp; เปอร์เซ็นต์ไขมัน</h2><canvas id="cBody"></canvas></div>
+    <div class="card"><h2>Training Volume ต่อเซสชัน</h2><canvas id="cVol"></canvas></div>
+    <div class="card"><h2>ความแข็งแรง – 1RM ประมาณการ</h2><select id="exSel" onchange="draw()" style="margin-bottom:14px"></select><canvas id="c1RM"></canvas></div>
+    <div class="card"><h2>สัดส่วน Volume ตามกลุ่มกล้ามเนื้อ</h2><canvas id="cMuscle"></canvas></div>
+    <div class="card" style="grid-column:1/-1"><h2>รอบวัดตัว (ซม.)</h2><canvas id="cMeas"></canvas></div>
+    <div class="card" style="grid-column:1/-1"><h2>สถิติส่วนตัวรายท่า (PR)</h2>
+      <table><thead><tr><th>ท่า</th><th>กลุ่ม</th><th>น้ำหนักสูงสุด</th><th>1RM ประมาณ</th><th>Volume รวม</th><th>ล่าสุด</th></tr></thead><tbody id="prBody"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- REPORT -->
+<section id="p-report" class="hide">
+  <div class="card" id="perCard" style="margin-bottom:18px">
+    <h2>รายงานตามช่วงเวลา <span class="pill" id="perRange"></span></h2>
+    <div class="chips" id="perChips"></div>
+    <div class="grid g4" id="perKpi"></div>
+    <div class="sub" id="perSum" style="margin:12px 0"></div>
+    <div class="grid g2">
+      <div class="card" style="background:var(--bg2)"><h2>Volume เทียบช่วงก่อนหน้า</h2><canvas id="cPerVol"></canvas></div>
+      <div class="card" style="background:var(--bg2)"><h2>1RM รายท่า (ก่อน vs นี้)</h2><canvas id="cPer1rm"></canvas><div class="sub" id="perExNote"></div></div>
+      <div class="card" style="background:var(--bg2)"><h2>น้ำหนักตัว / ไขมัน</h2><canvas id="cPerBody"></canvas><div class="sub" id="perBodyNote"></div></div>
+      <div class="card" style="background:var(--bg2)"><h2>คุณภาพฟอร์ม</h2><canvas id="cPerForm"></canvas><div class="sub" id="perFormNote"></div></div>
+    </div>
+    <div class="card" style="background:var(--bg2);margin-top:14px"><h2>Heat map กล้ามเนื้อ</h2><div class="chips" id="hmMode"></div><svg id="hmSvg" viewBox="0 0 400 410" style="width:100%;max-width:460px;display:block;margin:0 auto"><defs><g id="bd" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"><circle cx="100" cy="30" r="19"/><rect x="92" y="46" width="16" height="14" rx="5"/><path d="M68 64 Q100 56 132 64 L142 78 L140 150 Q136 175 128 190 L116 200 L84 200 L72 190 Q64 175 60 150 L58 78 Z"/><path d="M58 72 L38 90 L34 140 L30 178 L46 182 L52 140 L64 100 Z"/><path d="M142 72 L162 90 L166 140 L170 178 L154 182 L148 140 L136 100 Z"/><path d="M84 196 L70 280 L72 376 L90 380 L96 280 L100 210 Z"/><path d="M116 196 L130 280 L128 376 L110 380 L104 280 L100 210 Z"/></g></defs><use href="#bd"/><use href="#bd" x="200"/><g fill="var(--bg2)" stroke="var(--line)" stroke-width="1"><ellipse data-m="ไหล่" cx="63" cy="80" rx="15" ry="12"/><ellipse data-m="ไหล่" cx="137" cy="80" rx="15" ry="12"/><ellipse data-m="อก" cx="84" cy="100" rx="18" ry="14"/><ellipse data-m="อก" cx="116" cy="100" rx="18" ry="14"/><ellipse data-m="หน้าแขน" cx="46" cy="118" rx="8" ry="20"/><ellipse data-m="หน้าแขน" cx="154" cy="118" rx="8" ry="20"/><rect data-m="แกนกลาง" x="86" y="118" width="28" height="62" rx="10"/><ellipse data-m="หน้าขา" cx="84" cy="250" rx="16" ry="46"/><ellipse data-m="หน้าขา" cx="116" cy="250" rx="16" ry="46"/><ellipse data-m="น่อง" cx="80" cy="332" rx="10" ry="32"/><ellipse data-m="น่อง" cx="120" cy="332" rx="10" ry="32"/><g transform="translate(200,0)"><path data-m="หลัง" d="M72 76 Q100 68 128 76 L134 130 Q100 168 66 130 Z"/><ellipse data-m="ไหล่" cx="63" cy="80" rx="15" ry="12"/><ellipse data-m="ไหล่" cx="137" cy="80" rx="15" ry="12"/><ellipse data-m="หลังแขน" cx="46" cy="118" rx="8" ry="20"/><ellipse data-m="หลังแขน" cx="154" cy="118" rx="8" ry="20"/><ellipse data-m="ก้น" cx="86" cy="205" rx="17" ry="15"/><ellipse data-m="ก้น" cx="114" cy="205" rx="17" ry="15"/><ellipse data-m="หลังขา" cx="84" cy="258" rx="15" ry="42"/><ellipse data-m="หลังขา" cx="116" cy="258" rx="15" ry="42"/><ellipse data-m="น่อง" cx="80" cy="334" rx="10" ry="32"/><ellipse data-m="น่อง" cx="120" cy="334" rx="10" ry="32"/></g></g><text x="100" y="404" text-anchor="middle" font-size="12" fill="#7A786F">ด้านหน้า</text><text x="300" y="404" text-anchor="middle" font-size="12" fill="#7A786F">ด้านหลัง</text></svg><div class="sub" id="hmLegend" style="margin:10px 0"></div><div id="hmTable"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <h2>รายงานสรุปพัฒนาการสัดส่วน (วันแรก vs ล่าสุด)</h2>
+    <div style="font-size:13.5px;color:var(--sub);margin-bottom:12px">เปรียบเทียบค่าการวัดร่างกายเริ่มต้นเทียบกับผลลัพธ์ล่าสุดในคอร์ส (กราฟแท่งแนวนอน)</div>
+    <canvas id="cRepBar" class="c-rep"></canvas>
+  </div>
+  <div class="card">
+    <h2>กราฟพัฒนาการความแข็งแรงแยกตามรายท่า (เส้นแนวนอน)</h2>
+    <div style="font-size:13.5px;color:var(--sub);margin-bottom:16px">กราฟเส้นแสดงค่า 1RM ประมาณการของทุกท่าที่ลูกค้าเคยฝึกในคอร์สนี้</div>
+    <div class="grid g2" id="reportExGrid"></div>
+  </div>
+</section>
+
+<!-- TRAIN -->
+<section id="p-train" class="hide">
+  <div class="card" id="timerCard" style="margin-bottom:18px">
+    <h2>นาฬิกาจับเวลาพัก (Rest Timer)</h2>
+    <div class="timerwrap">
+      <div class="ring" id="ring"><div style="text-align:center"><div class="t" id="tDisp">0:30</div><div class="s" id="tState">พร้อมเริ่ม</div></div></div>
+      <div class="tcol">
+        <div class="presets" id="presets"></div>
+        <div class="tctrl">
+          <button class="tbig" id="btnGo" onclick="toggleT()">▶ เริ่ม</button>
+          <button class="ghost" onclick="resetT()">รีเซ็ต</button>
+          <button class="ghost" onclick="bumpT(30)">+30 วิ</button>
+          <button class="ghost" id="btnStop" onclick="stopAlarm()" style="display:none">🔇 หยุดเสียง</button>
+        </div>
+        <div class="vol">
+          🔊 ความดัง <input type="range" id="volR" min="0" max="100" value="100" oninput="volLbl.textContent=this.value+'%'"> <b id="volLbl">100%</b>
+          <span style="margin-left:10px">🔔 <label style="display:inline;margin:0"><input type="checkbox" id="preWarn" checked style="width:auto;vertical-align:middle"> เตือน 3 วินาทีสุดท้าย</label></span>
+          <span>⚡ <label style="display:inline;margin:0"><input type="checkbox" id="autoRest" checked style="width:auto;vertical-align:middle"> เริ่มจับเวลาอัตโนมัติหลังบันทึกท่า</label></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="tplCard" style="margin-bottom:18px">
+    <h2>เทมเพลตโปรแกรม</h2>
+    <div class="mgroup" id="tplList"></div>
+    <div id="tplQueue"></div>
+    <button class="ghost" id="btnTplMode" onclick="toggleTplMode()" style="margin-top:10px">＋ สร้างเทมเพลตใหม่</button>
+    <div id="tplBuilder" class="hide" style="margin-top:14px">
+      <input id="tplName" placeholder="ชื่อเทมเพลต เช่น Chest + Bicep" style="margin-bottom:12px">
+      <div id="tplDraftBox"></div>
+      <div class="hint">แตะท่าจากคลังด้านล่างเพื่อเพิ่มเข้าเทมเพลต</div>
+      <button onclick="saveTpl()">บันทึกเทมเพลต</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <h2>คลังท่าออกกำลังกาย — กดเลือกได้เลย</h2>
+    <div class="mgroup" id="mgroup"></div>
+    <input id="exSearch" placeholder="🔍 ค้นหาท่า เช่น squat, curl, plank..." oninput="renderEx()" style="margin-bottom:14px">
+    <div class="exgrid" id="exgrid"></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>บันทึกโปรแกรมการเทรน</h2>
+      <div id="exHint" class="hint hide"></div>
+      <div class="row r2"><div><label>วันที่</label><input type="date" id="tDate"></div><div><label>โฟกัสวันนี้</label><input id="tFocus" placeholder="Push Day / Lower Body"></div></div>
+      <div class="row r2"><div><label>ชื่อท่า</label><input id="tEx" list="exList" placeholder="เลือกจากคลังหรือพิมพ์เอง"><datalist id="exList"></datalist></div>
+      <div><label>กลุ่มกล้ามเนื้อ</label><select id="tMus"></select></div></div>
+      <label>จำนวนเซ็ต</label><div class="chips" id="nChips"></div>
+      <div id="sets"></div>
+      <button class="ghost" onclick="addSet()" style="margin:0 0 15px">+ เพิ่มเซ็ต</button>
+      <label>เทคนิคการยก</label><div class="chips" id="techChips"></div><div class="hint" id="techHint"></div>
+      <label>RIR — ครั้งที่ยังเหลือในถัง (1-5)</label><div class="chips" id="rirChips" data-e="rir"></div>
+      <label>RPE — ความหนักที่รู้สึก (1-10)</label><div class="chips" id="rpeChips" data-e="rpe"></div>
+      <div class="row"><div><label>โน้ต / ฟอร์ม</label><input id="tNote" placeholder="ฟอร์มดีขึ้น เพิ่มน้ำหนักได้อาทิตย์หน้า"></div></div>
+      <button onclick="saveEx()">บันทึกท่านี้</button>
+    </div>
+    <div class="card">
+      <h2>ท่าที่บันทึกวันนี้ <span class="pill" id="todayVol">0 kg</span></h2>
+      <table><thead><tr><th>ท่า</th><th>เซ็ต</th><th>Volume</th><th></th></tr></thead><tbody id="todayBody"></tbody></table>
+    </div>
+    <div class="card" id="dailyCard">
+      <h2>รายงานประจำวัน <span class="pill" id="drDate"></span></h2>
+      <div id="dailyBody"></div>
+      <label>สรุปโดยโค้ช</label>
+      <textarea id="drNote" rows="3" placeholder="สรุปภาพรวมการเทรนวันนี้" oninput="saveDrNote()"></textarea>
+      <button class="ghost" onclick="copyDaily()" style="margin-top:10px">คัดลอกรายงาน</button>
+    </div>
+  </div>
+</section>
+
+<!-- BODY -->
+<section id="p-body" class="hide">
+  <div class="card" style="max-width:840px">
+    <h2>บันทึกค่าร่างกาย</h2>
+    <div class="row r4">
+      <div><label>วันที่</label><input type="date" id="bDate"></div>
+      <div><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="bW"></div>
+      <div><label>ไขมัน (%)</label><input type="number" step="0.1" id="bF"></div>
+      <div><label>มวลกล้ามเนื้อ (kg)</label><input type="number" step="0.1" id="bM"></div>
+    </div>
+    <div class="row r4">
+      <div><label>รอบอก</label><input type="number" step="0.1" id="bChest"></div>
+      <div><label>รอบเอว</label><input type="number" step="0.1" id="bWaist"></div>
+      <div><label>รอบสะโพก</label><input type="number" step="0.1" id="bHip"></div>
+      <div><label>รอบแขน</label><input type="number" step="0.1" id="bArm"></div>
+    </div>
+    <div class="row r4"><div><label>รอบขา</label><input type="number" step="0.1" id="bThigh"></div></div>
+    <button onclick="saveBody()">บันทึกค่าวัด</button>
+  </div>
+  <div class="card" style="margin-top:18px"><h2>ประวัติการวัด</h2>
+    <table><thead><tr><th>วันที่</th><th>น้ำหนัก</th><th>ไขมัน%</th><th>กล้ามเนื้อ</th><th>อก</th><th>เอว</th><th>สะโพก</th><th>แขน</th><th>ขา</th><th></th></tr></thead><tbody id="bodyBody"></tbody></table>
+  </div>
+</section>
+
+<section id="p-hist" class="hide"><div class="card"><h2>ประวัติการเทรนทั้งหมด</h2><div id="histBody"></div></div></section>
+
+<section id="p-client" class="hide">
+  <div class="grid g2">
+    <div class="card">
+      <h2>เพิ่ม / แก้ไขลูกค้า</h2>
+      <div class="row r2"><div><label>ชื่อ-นามสกุล</label><input id="cName"></div><div><label>เบอร์โทร</label><input id="cPhone"></div></div>
+      <div class="row r3"><div><label>อายุ</label><input type="number" id="cAge"></div><div><label>เพศ</label><select id="cSex"><option>ชาย</option><option>หญิง</option></select></div><div><label>ส่วนสูง (ซม.)</label><input type="number" id="cH"></div></div>
+      <div class="row r2"><div><label>เป้าหมาย</label><select id="cGoal"><option>ลดไขมัน</option><option>เพิ่มกล้ามเนื้อ</option><option>เพิ่มความแข็งแรง</option><option>สุขภาพทั่วไป</option><option>ฟื้นฟูการบาดเจ็บ</option></select></div><div><label>จำนวนครั้งในคอร์ส</label><input type="number" id="cTotal" value="12"></div></div>
+      <div class="row r2"><div><label>วันเริ่มคอร์ส</label><input type="date" id="cStart"></div><div><label>โรคประจำตัว / ข้อจำกัด</label><input id="cMed" placeholder="เช่น ปวดหลังล่าง"></div></div>
+      <div style="display:flex;gap:9px"><button onclick="saveClient()">บันทึก</button><button class="ghost" onclick="newClient()">ลูกค้าใหม่</button><button class="red" onclick="delClient()">ลบลูกค้านี้</button></div>
+    </div>
+    <div class="card"><h2>รายชื่อลูกค้า</h2><table><thead><tr><th>ชื่อ</th><th>เป้าหมาย</th><th>คอร์ส</th><th></th></tr></thead><tbody id="clientBody"></tbody></table></div>
+  </div>
+</section>
+</div>
+
+<nav id="bnav"><button data-t="dash" class="on" onclick="tab('dash')"><i><svg viewBox="0 0 24 24"><path d="M5 20v-6M12 20V5M19 20v-9"/></svg></i><span>ภาพรวม</span></button><button data-t="report" onclick="tab('report')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></i><span>รายงาน</span></button><button data-t="train" onclick="tab('train')"><i><svg viewBox="0 0 24 24"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg></i><span>เทรน</span></button><button data-t="body" onclick="tab('body')"><i><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></svg></i><span>วัดตัว</span></button><button data-t="hist" onclick="tab('hist')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></i><span>ประวัติ</span></button><button data-t="client" onclick="tab('client')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></i><span>ลูกค้า</span></button></nav>
+
+<!-- ================= PRINT REPORT DOM CONTAINER ================= -->
+<div id="printReportArea">
+  <div class="print-page">
+    <div class="print-header">
+      <div>
+        <h2 id="prtName">ชื่อลูกค้า</h2>
+        <div style="font-size:13px;color:#555;margin-top:2px">รายงานสรุปพัฒนาการรายบุคคล (End-of-Course Progress Report)</div>
+      </div>
+      <div style="text-align:right;font-size:12.5px;color:#666">
+        <div>วันที่ออกรายงาน: <span id="prtPrintDate"></span></div>
+        <div>Biggy Trainer App</div>
+      </div>
+    </div>
+    <div class="print-info-grid">
+      <div><b>เป้าหมาย:</b> <span id="prtGoal">–</span></div>
+      <div><b>วันเริ่มคอร์ส:</b> <span id="prtStart">–</span></div>
+      <div><b>วันสิ้นสุด/ล่าสุด:</b> <span id="prtEnd">–</span></div>
+      <div><b>เซสชันที่เทรน:</b> <span id="prtSess">–</span></div>
+    </div>
+    <div class="print-card">
+      <h3>เปรียบเทียบสัดส่วนและน้ำหนักตัว (วันแรก vs ล่าสุด)</h3>
+      <div style="width:100%;height:250px"><canvas id="printBarCanvas"></canvas></div>
+    </div>
+  </div>
+  <div class="print-page" id="printExPagesContainer"></div>
+</div>
+
+<script>
+/* ===== EXERCISE LIBRARY ===== */
+const EXOLD={
+"อก":[
+["Barbell Bench Press","ท่าสร้างมวลกล้ามเนื้ออกรวมที่มีประสิทธิภาพสูงสุด"],
+["Incline Barbell Bench Press","เน้นอกส่วนบน"],
+["Decline Barbell Bench Press","เน้นอกส่วนล่าง"],
+["Dumbbell Bench Press","เพิ่มระยะการยืดและหดตัวของอกอย่างอิสระ"],
+["Incline Dumbbell Bench Press","เน้นอกบนด้วยดัมเบล"],
+["Dumbbell Flyes","ยืดเส้นใยกล้ามเนื้ออกในแนวนอน"],
+["Incline Dumbbell Flyes","ยืดและเน้นอกส่วนบน"],
+["Push-ups","ท่าวิดพื้นบอดี้เวทสร้างความแข็งแรงอกรวม"],
+["Incline Push-ups","วิดพื้นวางมือบนที่สูง เน้นอกส่วนล่าง"],
+["Decline Push-ups","วิดพื้นวางเท้าบนที่สูง เน้นอกส่วนบน"],
+["Cable Crossover","แรงต้านจากเคเบิลช่วยสร้างความชัดและเส้นอกกลาง"],
+["Low-to-High Cable Flyes","เคเบิลจากล่างขึ้นบน เน้นอกส่วนบน"],
+["High-to-Low Cable Flyes","เคเบิลจากบนลงล่าง เน้นอกส่วนล่าง"],
+["Chest Dips","โน้มตัวไปข้างหน้าเพื่อตัดแรงสามหัว แล้วเน้นอกล่างเต็มๆ"],
+["Pec Deck Machine","โฟกัสอกแนบแน่นโดยไม่ต้องกังวลเรื่องการทรงตัว"]],
+"หลัง":[
+["Conventional Deadlift","ท่าคอมพาวนด์สร้างความแข็งแรงและความหนาของหลังรวม"],
+["Barbell Bent-Over Row","สร้างความหนาแน่นให้หลังช่วงกลางและ Upper Back"],
+["Lat Pulldown","ดึงเคเบิลลงเพื่อสร้างหลังกว้าง (V-Shape)"],
+["Pull-ups (Overhand)","โหนบาร์ฝ่ามือคว่ำ เพิ่มความกว้างของ Latissimus Dorsi"],
+["Chin-ups (Underhand)","โหนบาร์หงายมือ ได้ทั้งหลังส่วนล่างและหน้าแขน"],
+["Single-Arm Dumbbell Row","ดึงดัมเบลทีละข้าง โฟกัสหลังและลดจุดอ่อนสองข้างที่ไม่เท่ากัน"],
+["Seated Cable Row","นั่งดึงเคเบิลเข้าหาลำตัว สร้างความหนาหลังช่วงกลาง"],
+["T-Bar Row","ดึงบาร์เบลมุมเอียง เพิ่มความหนาหลังส่วนกลาง"],
+["Meadows Row","ดึงบาร์เบลข้างเดียว ยืดและโฟกัส Lat อย่างล้ำลึก"],
+["Inverted Row","ดึงลำตัวเข้าหาบาร์ด้วยบอดี้เวท"],
+["Straight-Arm Cable Pulldown","ดึงเคเบิลแขนตึง โฟกัส Lat โดยไม่ใช้แรงไบเซป"],
+["Rack Pulls","ดึงบาร์เบลระดับเข่า เน้นหลังส่วนบน โหนกคอ และหลังล่าง"],
+["Hyperextension","เสริมสร้างกล้ามเนื้อหลังส่วนล่าง (Erector Spinae)"],
+["Face Pulls","ดึงสายเคเบิลเข้าหาระดับใบหน้า สร้างหลังส่วนบนและไหล่หลัง"],
+["Shrugs","ยกไหล่ขึ้นเพื่อสร้างกล้ามเนื้อโหนกคอ (Trapezius)"]],
+"ขา":[
+["Barbell Back Squat","ท่าราชาแห่งการเล่นขา ได้ทั้งหน้าขา หลังขา และสะโพก"],
+["Barbell Front Squat","เน้นแรงต้านลงหน้าขา (Quadriceps) และแกนกลางลำตัว"],
+["Leg Press","บริหารขาเต็มรูปแบบโดยลดแรงกดที่กระดูกสันหลัง"],
+["Romanian Deadlift (RDL)","เน้นยืดและเกร็งหลังขา (Hamstrings) และก้น"],
+["Bulgarian Split Squat","ย่อข้างเดียว เพิ่มการทรงตัว สร้างหน้าขา-ก้นอย่างตรงจุด"],
+["Walking Lunges","ก้าวขาเดินย่อตัว ได้ทั้งความแข็งแรงและการทรงตัว"],
+["Goblet Squat","สควอทถือดัมเบล/เคตเทิลเบลหน้าอก เหมาะสำหรับโฟกัสฟอร์ม"],
+["Leg Extension","เครื่องแยกเล่นหน้าขาโดยเฉพาะ"],
+["Lying Leg Curl","เครื่องนอนงอขา โฟกัสหลังขาอย่างตรงจุด"],
+["Seated Leg Curl","เครื่องนั่งงอขา ช่วยยืดและเล่นหลังขาในมุมนั่ง"],
+["Sumo Squat","สควอทแยกขากว้าง เน้นต้นขาด้านใน (Adductors) และก้น"],
+["Hip Thrust","ท่าเน้นสร้างกล้ามเนื้อก้น (Glutes) ที่ดีที่สุด"],
+["Standing Calf Raise","เขย่งเท้ายืน สร้างน่องส่วนนอก (Gastrocnemius)"],
+["Seated Calf Raise","เขย่งเท้านั่ง เน้นน่องส่วนลึก (Soleus)"],
+["Step-ups","ก้าวขึ้นม้านั่ง เน้นแรงก้นและหน้าขาข้างเดียว"]],
+"ไหล่":[
+["Overhead Barbell Press","ท่าหลักสร้างความแข็งแรงและมวลไหล่รวม (Military Press)"],
+["Seated Dumbbell Shoulder Press","ดันดัมเบลนั่ง เพิ่มระยะเคลื่อนไหวของหัวไหล่"],
+["Arnold Press","หมุนข้อมือขณะดันดัมเบล ได้หัวไหล่ทั้งส่วนหน้าและส่วนข้าง"],
+["Dumbbell Lateral Raise","กางแขนข้างลำตัว ท่าหลักในการสร้างไหล่กว้างด้านข้าง"],
+["Cable Lateral Raise","กางแขนด้วยเคเบิล ให้แรงต้านสม่ำเสมอตลอดช่วง"],
+["Front Dumbbell Raise","ยกดัมเบลไปข้างหน้า เน้นกล้ามเนื้อไหล่หน้า"],
+["Barbell Front Raise","ยกบาร์เบลไปข้างหน้า โฟกัสไหล่หน้าสองข้างพร้อมกัน"],
+["Rear Delt Flyes","ก้มตัวยกดัมเบล เน้นกล้ามเนื้อไหล่หลัง"],
+["Reverse Pec Deck Flyes","เครื่องกางแขนย้อนกลับ โฟกัสไหล่หลังได้แม่นยำ"],
+["Cable Rear Delt Flyes","ดึงสายเคเบิลสลับข้าง เน้นไหล่หลัง"],
+["Push Press","ใช้แรงส่งจากขาช่วยดันบาร์เบลเหนือศีรษะ ฝึกพลังหัวไหล่"],
+["Upright Row","ดึงบาร์เบลหรือเคเบิลขึ้นระดับอก ได้ไหล่ข้างและโหนกคอ"],
+["Landmine Press","ดันบาร์เบลมุมเฉียง ลดแรงกดหัวไหล่ ปลอดภัยต่อข้อต่อ"],
+["High Incline Dumbbell Press","เบาะชันสูง เน้นรอยต่ออกบนและไหล่หน้า"],
+["Bus Driver (Plate Twist)","ถือแผ่นน้ำหนักแขนตรงแล้วหมุนซ้าย-ขวา สร้างความทนทานหัวไหล่"]],
+"แขน":[
+["Barbell Bicep Curl","ท่าหลักสร้างมวลหน้าแขน (Biceps)"],
+["Dumbbell Alternate Bicep Curl","ยกดัมเบลสลับซ้าย-ขวา โฟกัสหน้าแขนทีละข้าง"],
+["Hammer Curl","หันฝ่ามือเข้าหากัน เน้น Brachialis และแขนท่อนล่าง"],
+["Preacher Curl","วางแขนบนเบาะเฉียง ล็อคไหล่โฟกัสหน้าแขนลูกเดียว"],
+["Incline Dumbbell Curl","นอนเบาะเฉียง ยืดหน้าแขนสุดช่วงการเคลื่อนไหว"],
+["Concentration Curl","นั่งเอาศอกค้ำต้นขาด้านใน โฟกัสยอดกล้ามเนื้อ (Bicep Peak)"],
+["Cable Bicep Curl","ใช้เคเบิลสร้างแรงต้านต่อเนื่องให้หน้าแขน"],
+["Tricep Dips","ดันตัวกับบาร์คู่หรือม้านั่ง เน้นหลังแขนเต็มๆ"],
+["Close-Grip Barbell Bench Press","จับบาร์เบลแคบ ดันเน้นมวลหลังแขนรวม"],
+["Skull Crushers","นอนยืด-พับแขนท่อนล่าง เน้นหลังแขนหัวยาว"],
+["Triceps Pushdown (Rope)","ดึงเชือกเคเบิลลง เน้นหลังแขนหัวนอก"],
+["Triceps Pushdown (Straight Bar)","ดึงบาร์ตรงเคเบิลลง เน้นหลังแขนรวม"],
+["Overhead Dumbbell Triceps Extension","ชูดัมเบลเหนือศีรษะ ยืดหลังแขนหัวยาว (Long Head)"],
+["Single-Arm Cable Triceps Extension","ดึงเคเบิลหลังแขนทีละข้าง"],
+["Reverse Curl","คว่ำมือยกลูกน้ำหนัก บริหารแขนท่อนล่างและหน้าแขน"]],
+"แกนกลาง":[
+["Plank","เกร็งลำตัวขนานพื้น สร้างความแข็งแรงแกนกลางขั้นพื้นฐาน"],
+["Ab Wheel Rollout","กลิ้งลูกกลิ้งหน้าท้อง ท่าระดับสูงที่เกร็งหน้าท้องได้รุนแรง"],
+["Hanging Leg Raise","โหนบาร์ยกขา เน้นหน้าท้องส่วนล่าง (Lower Abs)"],
+["Reverse Crunch","นอนยกสะโพกขึ้นหาอก เน้นหน้าท้องส่วนล่าง"],
+["Crunches","งอลำตัวส่วนบนเข้าหาหน้าท้อง เน้นหน้าท้องส่วนบน"],
+["Cable Crunch","คุกเข่าดึงสายเคเบิล เพิ่มน้ำหนักสร้างความหนาให้แพ็คหน้าท้อง"],
+["Bicycle Crunch","บิดตัวสลับซ้าย-ขวา ได้ทั้งหน้าท้องตรงและร่องข้างลำตัว"],
+["Russian Twist","นั่งบิดลำตัวซ้าย-ขวา เน้นกล้ามเนื้อท้องข้าง (Obliques)"],
+["Side Plank","แพลงค์ตะแคงข้าง เสริมความแข็งแรงท้องข้างและสะโพก"],
+["Mountain Climbers","ดึงเข่าเข้าหาอกสลับกันอย่างรวดเร็ว ได้ทั้งหน้าท้องและคาร์ดิโอ"],
+["Woodchopper","บิดลำตัวตามแนวเฉียง เสริมแรงหมุนแกนกลาง"],
+["Dragon Flag","ยกเกร็งลำตัวขึ้นตรง ท่าหน้าท้องระดับสูง"],
+["Dead Bug","นอนขยับแขนและขาตรงข้าม ฝึกเสถียรภาพแกนกลางโดยไม่ปวดหลัง"],
+["Bird-Dog","คุกเข่ายืดแขนและขาฝั่งตรงข้าม เสริมความแข็งแรงหลังล่างและแกนกลาง"],
+["Captain's Chair Leg Raise","วางแขนบนเบาะแล้วยกขาขึ้น เน้นหน้าท้องล่าง เหมาะผู้เริ่มเล่น"]],
+"คาร์ดิโอ":[
+["Treadmill Run","วิ่งลู่ ปรับความเร็ว/ความชันได้"],
+["Incline Walk","เดินชัน เผาไขมันโดยแรงกระแทกต่ำ"],
+["Stationary Bike","ปั่นจักรยาน คาร์ดิโอแรงกระแทกต่ำ"],
+["Rowing Machine","เครื่องพาย ได้ทั้งคาร์ดิโอและหลัง"],
+["Elliptical","เครื่องเดินวงรี ถนอมข้อเข่า"],
+["Jump Rope","กระโดดเชือก เผาผลาญสูงในเวลาสั้น"],
+["Stair Climber","เครื่องเดินขึ้นบันได เน้นก้นและน่อง"],
+["HIIT Circuit","สลับหนัก-เบาเป็นรอบ เผาผลาญต่อเนื่องหลังเลิกเทรน"],
+["Battle Rope","สะบัดเชือกใหญ่ ได้ทั้งไหล่ แขน และคาร์ดิโอ"],
+["Burpees","ท่าผสมเต็มตัว เพิ่มอัตราการเต้นหัวใจเร็ว"]]
+};
+const NEWX={"หน้าขา": "Bodyweight Squat|Back Squat|Front Squat|Goblet Squat|Hack Squat|Leg Press|Leg Extension|Bulgarian Split Squat|Front Foot Elevated Split Squat|Reverse Lunge|Walking Lunge|Forward Lunge|Step Up|Sissy Squat|Cyclist Squat|Heel Elevated Squat|Spanish Squat|Split Squat|Smith Machine Squat|Pendulum Squat|Safety Bar Squat|Zercher Squat|Wall Sit|Jump Squat|Pistol Squat", "ก้น": "Barbell Hip Thrust|Dumbbell Hip Thrust|Glute Bridge|Single-Leg Glute Bridge|Cable Pull Through|Romanian Deadlift|Sumo Deadlift|Bulgarian Split Squat|Reverse Lunge|Walking Lunge|Step Up|Single-Leg Hip Thrust|Frog Pump|Banded Glute Bridge|Cable Kickback|Donkey Kick|Fire Hydrant|Standing Hip Abduction|Seated Hip Abduction|Curtsy Lunge|Deficit Reverse Lunge|Step Down|Single-Leg RDL|45° Back Extension|Kettlebell Swing", "หลังขา": "Romanian Deadlift|Stiff-Leg Deadlift|Conventional Deadlift|Sumo Deadlift|Single-Leg RDL|Dumbbell RDL|Barbell RDL|Good Morning|Nordic Hamstring Curl|Glute-Ham Raise|Lying Leg Curl|Seated Leg Curl|Standing Leg Curl|Slider Leg Curl|Stability Ball Leg Curl|Swiss Ball Hamstring Curl|Cable Leg Curl|Banded Leg Curl|Single-Leg Leg Curl|Razor Curl|Reverse Nordic Curl|Kettlebell Swing|45° Back Extension|Deficit RDL|Snatch-Grip RDL", "น่อง": "Standing Calf Raise|Seated Calf Raise|Leg Press Calf Raise|Single-Leg Calf Raise|Smith Machine Calf Raise|Donkey Calf Raise|Machine Calf Raise|Dumbbell Calf Raise|Barbell Calf Raise|Stair Calf Raise|Deficit Calf Raise|Bent-Knee Calf Raise|Single-Leg Seated Calf Raise|Tibia-Supported Calf Raise|Calf Raise Isometric Hold|Jump Rope|Pogo Jump|Box Jump|Ankle Hops|Farmer Walk on Toes|Sled Push|Sled Drag|Stair Climb|Calf Raise + Pause|Calf Raise + Slow Eccentric", "อก": "Barbell Bench Press|Dumbbell Bench Press|Incline Barbell Bench Press|Incline Dumbbell Press|Decline Bench Press|Dumbbell Fly|Cable Fly|Low-to-High Cable Fly|High-to-Low Cable Fly|Pec Deck|Machine Chest Press|Push-Up|Incline Push-Up|Decline Push-Up|Diamond Push-Up|Wide Push-Up|Deficit Push-Up|Chest Dips|Ring Push-Up|Dumbbell Squeeze Press|Floor Press|Single-Arm Dumbbell Press|Landmine Press|Cable Press|Smith Machine Bench Press", "หลัง": "Pull-Up|Chin-Up|Lat Pulldown|Close-Grip Lat Pulldown|Wide-Grip Lat Pulldown|Single-Arm Lat Pulldown|Barbell Row|Dumbbell Row|Chest-Supported Row|Seated Cable Row|Single-Arm Cable Row|T-Bar Row|Machine Row|Inverted Row|Meadows Row|Pendlay Row|Seal Row|Straight-Arm Pulldown|Dumbbell Pullover|Cable Pullover|Face Pull|Rack Pull|Deadlift|Trap Bar Deadlift|Renegade Row", "ไหล่": "Barbell Overhead Press|Dumbbell Shoulder Press|Arnold Press|Machine Shoulder Press|Seated Dumbbell Press|Single-Arm Landmine Press|Push Press|Dumbbell Lateral Raise|Cable Lateral Raise|Machine Lateral Raise|Lean-Away Lateral Raise|Front Raise|Cable Front Raise|Plate Front Raise|Rear Delt Fly|Reverse Pec Deck|Cable Rear Delt Fly|Face Pull|Upright Row|Cuban Press|Y-Raise|Scaption Raise|Handstand Push-Up|Pike Push-Up|Bottom-Up Kettlebell Press", "หน้าแขน": "Barbell Curl|EZ-Bar Curl|Dumbbell Curl|Alternating Dumbbell Curl|Hammer Curl|Cross-Body Hammer Curl|Incline Dumbbell Curl|Preacher Curl|Cable Curl|Bayesian Cable Curl|Concentration Curl|Spider Curl|Drag Curl|Reverse Curl|Zottman Curl|Machine Biceps Curl|Single-Arm Cable Curl|High Cable Curl|21s Curl|Seated Dumbbell Curl|Standing Cable Curl|Resistance Band Curl|Isometric Biceps Hold|Chin-Up|Close-Grip Chin-Up", "หลังแขน": "Triceps Pushdown|Rope Pushdown|Straight-Bar Pushdown|Reverse-Grip Pushdown|Overhead Cable Extension|Dumbbell Overhead Extension|EZ-Bar Skull Crusher|Dumbbell Skull Crusher|Close-Grip Bench Press|Diamond Push-Up|Bench Dips|Parallel Bar Dips|Single-Arm Cable Extension|Cross-Body Cable Extension|Cable Kickback|Dumbbell Kickback|Machine Triceps Extension|Tate Press|JM Press|Floor Skull Crusher|Bodyweight Triceps Extension|Resistance Band Pushdown|Resistance Band Overhead Extension|Landmine Triceps Extension|Incline Dumbbell Triceps Extension", "แกนกลาง": "Plank|Side Plank|Dead Bug|Bird Dog|Crunch|Reverse Crunch|Bicycle Crunch|Sit-Up|V-Up|Toe Touch|Leg Raise|Hanging Leg Raise|Knee Raise|Ab Wheel Rollout|Cable Crunch|Pallof Press|Russian Twist|Mountain Climber|Hollow Body Hold|Hollow Rock|Bear Crawl|Suitcase Carry|Farmer Carry|Turkish Get-Up|Dragon Flag"};
+NEWX['คาลิสเธนิกส์']='Pull-Up|Chin-Up|Muscle-Up|Australian Pull-Up|Typewriter Pull-Up|Ring Row|Push-Up|Diamond Push-Up|Archer Push-Up|Pseudo Planche Push-Up|Clapping Push-Up|Pike Push-Up|Handstand Push-Up|Handstand Hold|Bar Dips|Ring Dips|Pistol Squat|Shrimp Squat|Jump Squat|Hanging Leg Raise|Toes to Bar|L-Sit|Hollow Body Hold|Dragon Flag|Front Lever|Back Lever|Human Flag|Planche Lean|Skin the Cat|Burpee';NEWX['Hyrox']='Run 1 km Interval|SkiErg|Sled Push|Sled Pull|Burpee Broad Jump|Rowing Machine|Farmer Carry|Sandbag Lunge|Wall Ball|Sandbag Ground-to-Shoulder|Sandbag Carry|Kettlebell Swing|Assault Bike|Box Step-Over|Weighted Vest Run|Hyrox Simulation';
+const nk=n=>n.toLowerCase().replace(/[^a-z0-9]/g,'').replace(/s$/,'');
+const D0={};Object.keys(EXOLD).forEach(m=>EXOLD[m].forEach(e=>D0[nk(e[0])]=e[1]));
+const DX={};`Bodyweight Squat|สควอตน้ำหนักตัว เหมาะฝึกท่าและวอร์มอัพขา
+Back Squat|สควอตบาร์หลังไหล่ ท่าสร้างความแข็งแรงขาและก้นรวม
+Front Squat|บาร์อยู่หน้าไหล่ เน้นหน้าขาและแกนกลางลำตัว
+Hack Squat|สควอตแบบเครื่อง เน้นหน้าขาโดยลดภาระหลังส่วนล่าง
+Front Foot Elevated Split Squat|ยกเท้าหน้าบนแผ่นรอง เพิ่มช่วงเคลื่อนไหวหน้าขาและก้น
+Reverse Lunge|ก้าวถอยหลังลงลันจ์ เป็นมิตรกับเข่าและเน้นก้น
+Forward Lunge|ก้าวไปข้างหน้าลงลันจ์ เน้นหน้าขาและก้น
+Sissy Squat|เอนตัวไปด้านหลังลงต่ำ แยกหน้าขาส่วน Rectus Femoris
+Cyclist Squat|สควอตเท้าชิดยกส้นสูง เน้นหน้าขาด้านนอก
+Heel Elevated Squat|ยกส้นเท้า ช่วยให้ย่อลึกและเน้นหน้าขา
+Spanish Squat|ใช้สายรัดดึงเข่า เน้นหน้าขาและลดแรงกดเข่า
+Split Squat|ยืนแยกขาย่อตัว ฝึกทีละข้างเพื่อความสมดุล
+Smith Machine Squat|สควอตด้วยสมิธแมชชีน ควบคุมแนวเคลื่อนที่ได้ง่าย
+Pendulum Squat|เครื่องสควอตแนวโค้ง เน้นหน้าขาแรงต้านสูง
+Safety Bar Squat|บาร์ Safety ลดแรงดึงที่ไหล่ ตัวตรงขึ้น
+Zercher Squat|ถือบาร์ที่ข้อพับแขน เน้นขา แกนกลางและหลังบน
+Wall Sit|พิงกำแพงนั่งค้าง ฝึกความอดทนหน้าขา
+Jump Squat|สควอตกระโดด ฝึกพลังระเบิดของขา
+Pistol Squat|สควอตขาเดียว ต้องการความแข็งแรง สมดุล และความยืดหยุ่น
+Barbell Hip Thrust|ดันสะโพกด้วยบาร์เบล ท่าหลักสร้างก้น
+Dumbbell Hip Thrust|ดันสะโพกด้วยดัมเบล เหมาะกับผู้เริ่มต้น
+Glute Bridge|นอนยกสะโพก ปลุกกล้ามเนื้อก้นและฝึกพื้นฐาน
+Single-Leg Glute Bridge|ยกสะโพกขาเดียว ฝึกความสมดุลซ้ายขวา
+Cable Pull Through|ดึงเคเบิลผ่านขา สอนการพับสะโพกและเน้นก้น
+Romanian Deadlift|ยกขึ้นโดยเข่าเกือบตรง เน้นหลังขาและก้น
+Sumo Deadlift|เดดลิฟต์ท่ายืนกว้าง เน้นก้นและต้นขาด้านใน
+Single-Leg Hip Thrust|ดันสะโพกขาเดียว เพิ่มความหนักให้ก้น
+Frog Pump|นอนฝ่าเท้าชิดกัน ยกสะโพกเร็ว เน้นก้นแบบ High Rep
+Banded Glute Bridge|ใส่ยางยืดที่เข่า เพิ่มการทำงานของก้นข้าง
+Cable Kickback|เตะขาไปด้านหลังกับเคเบิล เน้นก้นหรือหลังแขนตามท่า
+Donkey Kick|คุกเข่าเตะขาขึ้น ท่าบอดี้เวทเน้นก้น
+Fire Hydrant|คุกเข่ากางขาออกด้านข้าง เน้นก้นข้าง
+Standing Hip Abduction|ยืนกางขาออกด้านข้าง เน้นก้นข้าง
+Seated Hip Abduction|นั่งกางขาที่เครื่อง เน้นก้นข้างและสะโพกนอก
+Curtsy Lunge|ลันจ์ไขว้ขาไปด้านหลัง เน้นก้นข้างและสะโพก
+Deficit Reverse Lunge|ลันจ์ถอยหลังบนแท่นสูง เพิ่มช่วงเคลื่อนไหวของก้น
+Step Down|ก้าวลงจากแท่นอย่างช้า ควบคุมขาและเข่า
+Single-Leg RDL|RDL ขาเดียว ฝึกสมดุลหลังขาและก้น
+45° Back Extension|ก้มยืดหลังบนเครื่อง 45 องศา เน้นก้นและหลังล่าง
+Kettlebell Swing|แกว่งเคทเทิลเบลล์ด้วยสะโพก ฝึกพลังหลังขาและก้น
+Stiff-Leg Deadlift|เดดลิฟต์ขาตรง ยืดและเน้นหลังขา
+Dumbbell RDL|RDL ด้วยดัมเบล เหมาะฝึกท่าพับสะโพก
+Barbell RDL|RDL ด้วยบาร์เบล ใส่น้ำหนักได้มากสำหรับหลังขา
+Good Morning|บาร์บนหลังก้มพับสะโพก เน้นหลังขาและหลังล่าง
+Nordic Hamstring Curl|คุกเข่าล้มตัวไปข้างหน้าช้า ๆ สร้างความแข็งแรงหลังขาแบบเหยียด
+Glute-Ham Raise|ยกลำตัวบนเครื่อง GHR เน้นหลังขาและก้น
+Standing Leg Curl|ยืนงอเข่าทีละข้าง เน้นหลังขา
+Slider Leg Curl|นอนยกสะโพกแล้วเลื่อนส้นเท้า เน้นหลังขา
+Stability Ball Leg Curl|ใช้ลูกบอลดึงส้นเท้าเข้าหา เน้นหลังขาและแกนกลาง
+Swiss Ball Hamstring Curl|ท่าเดียวกับ Stability Ball Leg Curl เน้นหลังขา
+Cable Leg Curl|งอเข่ากับเคเบิล ควบคุมแรงต้านสม่ำเสมอ
+Banded Leg Curl|ใช้ยางยืดงอเข่า ฝึกหลังขาได้ทุกที่
+Single-Leg Leg Curl|งอเข่าทีละข้างบนเครื่อง แก้ความไม่สมดุล
+Razor Curl|ท่าแบบ Nordic ผสมงอเข่า เน้นหลังขาขั้นสูง
+Reverse Nordic Curl|คุกเข่าเอนตัวไปหลัง ยืดและเสริมหน้าขา
+Deficit RDL|RDL ยืนบนแท่นสูง เพิ่มช่วงยืดหลังขา
+Snatch-Grip RDL|จับบาร์กว้าง เพิ่มช่วงเคลื่อนไหวและกระตุ้นหลังบน
+Leg Press Calf Raise|เขย่งน่องบนเครื่อง Leg Press ปลอดภัยใส่น้ำหนักมาก
+Single-Leg Calf Raise|เขย่งน่องทีละข้าง แก้ความไม่สมดุล
+Smith Machine Calf Raise|เขย่งน่องด้วยสมิธแมชชีน ควบคุมง่าย
+Donkey Calf Raise|ก้มตัวเขย่งน่อง ยืดน่องได้ลึก
+Machine Calf Raise|เขย่งน่องบนเครื่อง เน้นน่องส่วน Gastrocnemius
+Dumbbell Calf Raise|เขย่งน่องถือดัมเบล เหมาะฝึกที่บ้าน
+Barbell Calf Raise|เขย่งน่องด้วยบาร์เบลบนบ่า ใส่น้ำหนักได้มาก
+Stair Calf Raise|เขย่งน่องบนขั้นบันได ท่าง่ายและยืดน่องได้ดี
+Deficit Calf Raise|ยืนบนแท่นให้ส้นเท้าต่ำกว่า เพิ่มช่วงยืด
+Bent-Knee Calf Raise|เขย่งน่องขณะงอเข่า เน้นน่องส่วนลึก Soleus
+Single-Leg Seated Calf Raise|นั่งเขย่งน่องทีละข้าง เน้น Soleus
+Tibia-Supported Calf Raise|ฝึกน่องและกล้ามเนื้อหน้าแข้งเพื่อสมดุลข้อเท้า
+Calf Raise Isometric Hold|เขย่งค้างสุดช่วง เพิ่มความแข็งแรงและความมั่นคงข้อเท้า
+Pogo Jump|กระโดดเด้งด้วยข้อเท้า ฝึกความเด้งและความแข็งแรงเอ็น
+Box Jump|กระโดดขึ้นกล่อง ฝึกพลังระเบิดขา
+Ankle Hops|กระโดดเบา ๆ ด้วยข้อเท้า ฝึกความว่องไวของน่อง
+Farmer Walk on Toes|ถือน้ำหนักเดินเขย่งปลายเท้า ฝึกน่องและความมั่นคง
+Sled Push|ดันเลื่อนน้ำหนัก ฝึกขา แกนกลาง และพลังงานระบบแอโรบิก (สถานี Hyrox)
+Sled Drag|ลากเลื่อนน้ำหนักถอยหลัง เน้นน่อง หลังขา และสภาพร่างกาย
+Stair Climb|ก้าวขึ้นบันได ฝึกน่อง ก้น และหัวใจ
+Calf Raise + Pause|เขย่งน่องแล้วหยุดค้างที่จุดสูงสุด เพิ่มการควบคุม
+Calf Raise + Slow Eccentric|ลดส้นเท้าลงช้า ๆ กระตุ้นการเติบโตของน่อง
+Incline Dumbbell Press|ดัมเบลบนม้าเอียง เน้นอกส่วนบน
+Decline Bench Press|ม้านอนเอียงลง เน้นอกส่วนล่าง
+Dumbbell Fly|กางแขนไดนามิก ยืดกล้ามเนื้ออกให้สุด
+Cable Fly|ดึงเคเบิลเข้าหากัน แรงต้านคงที่ตลอดช่วง
+Low-to-High Cable Fly|ดึงเคเบิลจากล่างขึ้นบน เน้นอกส่วนบน
+High-to-Low Cable Fly|ดึงเคเบิลจากบนลงล่าง เน้นอกส่วนล่าง
+Pec Deck|เครื่องบีบอก แยกกล้ามเนื้ออกและควบคุมง่าย
+Machine Chest Press|เครื่องดันอก เหมาะสำหรับผู้เริ่มต้นและฝึกจนล้า
+Diamond Push-Up|วิดพื้นมือชิด เน้นหลังแขนและอกใน
+Wide Push-Up|วิดพื้นมือกว้าง เน้นอกด้านนอก
+Deficit Push-Up|วิดพื้นบนแท่น ลงต่ำกว่าปกติ เพิ่มช่วงเคลื่อนไหว
+Ring Push-Up|วิดพื้นบนห่วง เพิ่มความไม่มั่นคงและกระตุ้นแกนกลาง
+Dumbbell Squeeze Press|กดดัมเบลชิดกันขณะดัน เกร็งอกตลอดท่า
+Floor Press|ดันบนพื้น จำกัดช่วงเคลื่อนไหว เน้นช่วงล็อกเอาท์และหลังแขน
+Single-Arm Dumbbell Press|ดันดัมเบลทีละข้าง เพิ่มการใช้แกนกลาง
+Cable Press|ดันเคเบิลไปข้างหน้า แรงต้านต่อเนื่อง
+Smith Machine Bench Press|เบนช์เพรสสมิธแมชชีน ควบคุมแนวเคลื่อนที่ง่าย
+Pull-Up|ดึงข้อมือคว่ำ ท่าหลักสร้างความกว้างของหลัง
+Chin-Up|ดึงข้อมือหงาย ใช้หน้าแขนมากขึ้นและเน้นหลังล่างของลาท
+Close-Grip Lat Pulldown|ดึงลงมือแคบ เน้นกลางหลังและหลังช่วงล่าง
+Wide-Grip Lat Pulldown|ดึงลงมือกว้าง เน้นความกว้างของลาท
+Single-Arm Lat Pulldown|ดึงทีละข้าง ปรับสมดุลซ้ายขวา
+Barbell Row|พายบาร์เบล สร้างความหนาและความแข็งแรงหลังรวม
+Dumbbell Row|พายดัมเบลทีละข้าง ช่วงเคลื่อนไหวกว้าง
+Chest-Supported Row|พายโดยอกพิงม้า ลดภาระหลังล่าง
+Single-Arm Cable Row|พายเคเบิลทีละข้าง ควบคุมการบีบหลัง
+Machine Row|เครื่องพาย แยกกล้ามเนื้อหลังได้ง่าย
+Pendlay Row|พายจากพื้นทุกครั้ง ฝึกพลังและความแม่นยำ
+Seal Row|นอนคว่ำบนม้าสูงพายบาร์ ตัดแรงเหวี่ยงออก
+Straight-Arm Pulldown|ดึงเคเบิลแขนตรง แยกการทำงานของลาท
+Dumbbell Pullover|ดึงดัมเบลข้ามศีรษะ ยืดลาทและอก
+Cable Pullover|ดึงเคเบิลข้ามศีรษะ แรงต้านคงที่ที่ลาท
+Deadlift|ยกบาร์จากพื้น ท่าสร้างความแข็งแรงทั้งหลังและขา
+Trap Bar Deadlift|เดดลิฟต์ด้วยบาร์หกเหลี่ยม ท่าทางง่ายและลดภาระหลัง
+Renegade Row|ท่าวิดพื้นสลับพายดัมเบล ฝึกหลังและแกนกลางพร้อมกัน
+Barbell Overhead Press|ดันบาร์เหนือศีรษะ ท่าหลักสร้างไหล่
+Dumbbell Shoulder Press|ดันดัมเบลเหนือศีรษะ เพิ่มการเคลื่อนไหวอิสระ
+Machine Shoulder Press|เครื่องดันไหล่ ปลอดภัยสำหรับผู้เริ่มต้น
+Seated Dumbbell Press|ดันดัมเบลขณะนั่ง ลดการโกงด้วยลำตัว
+Single-Arm Landmine Press|ดันบาร์ Landmine ทีละข้าง ไหล่ปลอดภัยและฝึกแกนกลาง
+Machine Lateral Raise|ยกด้านข้างด้วยเครื่อง แรงต้านคงที่ เน้นไหล่ข้าง
+Lean-Away Lateral Raise|เอนตัวออกขณะยกข้าง เพิ่มแรงต้านช่วงล่าง
+Front Raise|ยกแขนไปด้านหน้า เน้นไหล่หน้า
+Cable Front Raise|ยกหน้าด้วยเคเบิล แรงต้านต่อเนื่อง
+Plate Front Raise|ยกแผ่นน้ำหนักไปด้านหน้า เน้นไหล่หน้า
+Rear Delt Fly|กางแขนไปด้านหลัง เน้นไหล่หลัง
+Reverse Pec Deck|เครื่องกางแขนหลัง เน้นไหล่หลังและหลังบน
+Cable Rear Delt Fly|ดึงเคเบิลไขว้กางแขน เน้นไหล่หลัง
+Cuban Press|หมุนไหล่ผสมดันขึ้น ฝึกเสถียรภาพ Rotator Cuff
+Y-Raise|ยกแขนเป็นรูปตัว Y เน้นไหล่หลังและกล้ามเนื้อสะบักล่าง
+Scaption Raise|ยกแขนเฉียงหน้าในระนาบสะบัก ปลอดภัยต่อไหล่
+Handstand Push-Up|วิดพื้นท่ากลับหัว ไหล่ขั้นสูง
+Pike Push-Up|วิดพื้นตัวพับ ท่าเตรียมสู่ Handstand Push-Up
+Bottom-Up Kettlebell Press|ดันเคทเทิลเบลล์คว่ำ ฝึกความมั่นคงไหล่และข้อมือ
+Barbell Curl|เคิร์ลบาร์ตรง ท่าหลักสร้างหน้าแขนด้วยน้ำหนักมาก
+EZ-Bar Curl|เคิร์ลบาร์โค้ง ลดแรงกดที่ข้อมือ
+Dumbbell Curl|เคิร์ลดัมเบล ฝึกซ้ายขวาอิสระ
+Alternating Dumbbell Curl|เคิร์ลดัมเบลสลับข้าง ควบคุมท่าทางง่าย
+Cross-Body Hammer Curl|เคิร์ลค้อนข้ามลำตัว เน้น Brachialis
+Cable Curl|เคิร์ลกับเคเบิล แรงต้านต่อเนื่อง
+Bayesian Cable Curl|เคิร์ลเคเบิลหันหลังให้เครื่อง ยืดหน้าแขนมากที่สุด
+Spider Curl|นอนคว่ำบนม้าเอียงเคิร์ล ตัดแรงเหวี่ยง
+Drag Curl|ลากบาร์ขึ้นชิดลำตัว เน้นหน้าแขนส่วนยาว
+Zottman Curl|ยกขึ้นฝ่ามือหงาย ลดลงฝ่ามือคว่ำ ฝึกหน้าแขนและปลายแขน
+Machine Biceps Curl|เคิร์ลบนเครื่อง ฝึกจนล้าได้ปลอดภัย
+Single-Arm Cable Curl|เคิร์ลเคเบิลทีละข้าง ปรับสมดุลซ้ายขวา
+High Cable Curl|ยกแขนสูงดึงเคเบิลเข้าหาศีรษะ เน้นหัวสั้นหน้าแขน
+21s Curl|เคิร์ล 7 ครั้งครึ่งล่าง 7 ครั้งครึ่งบน 7 ครั้งเต็ม
+Seated Dumbbell Curl|เคิร์ลขณะนั่ง ลดการโกงด้วยลำตัว
+Standing Cable Curl|ยืนเคิร์ลเคเบิล แรงต้านคงที่
+Resistance Band Curl|เคิร์ลด้วยยางยืด เหมาะฝึกที่บ้านหรือเดินทาง
+Isometric Biceps Hold|ค้างหน้าแขนที่มุม 90 องศา เพิ่มความแข็งแรงช่วงกลาง
+Close-Grip Chin-Up|ดึงข้อมือหงายมือชิด เน้นหน้าแขนมากขึ้น
+Triceps Pushdown|ดันเคเบิลลง ท่าหลักสร้างหลังแขน
+Rope Pushdown|ดันเชือกลงแล้วแยกมือออก เน้นหัวข้างของหลังแขน
+Straight-Bar Pushdown|ดันบาร์ตรงลง ใช้น้ำหนักมากได้
+Reverse-Grip Pushdown|ดันลงมือหงาย เน้นหัวในของหลังแขน
+Overhead Cable Extension|เหยียดแขนเหนือศีรษะกับเคเบิล ยืดหัวยาวของหลังแขน
+Dumbbell Overhead Extension|เหยียดแขนเหนือศีรษะด้วยดัมเบล เน้นหัวยาวของหลังแขน
+EZ-Bar Skull Crusher|นอนงอข้อศอกลดบาร์ EZ เน้นหลังแขนมวลมาก
+Dumbbell Skull Crusher|ท่าเดียวกันด้วยดัมเบล ช่วงเคลื่อนไหวอิสระ
+Close-Grip Bench Press|เบนช์มือแคบ เน้นหลังแขนและอกใน
+Bench Dips|ดิปบนม้า ท่าบอดี้เวทฝึกหลังแขน
+Parallel Bar Dips|ดิปบนบาร์คู่ ใส่น้ำหนักเพิ่มได้ เน้นหลังแขนและอก
+Single-Arm Cable Extension|เหยียดแขนเคเบิลทีละข้าง ปรับสมดุล
+Cross-Body Cable Extension|ดึงเคเบิลข้ามลำตัว เน้นหัวข้างหลังแขน
+Dumbbell Kickback|เหวี่ยงดัมเบลไปด้านหลัง บีบหลังแขนสุด
+Machine Triceps Extension|เครื่องเหยียดแขน ฝึกจนล้าอย่างปลอดภัย
+Tate Press|ดัมเบลข้อศอกกาง ลดลงหาอก เน้นหลังแขน
+JM Press|ผสมเบนช์มือแคบและสกัลครัชเชอร์ ใช้น้ำหนักมาก
+Floor Skull Crusher|นอนพื้นทำ Skull Crusher จำกัดช่วงเคลื่อนไหวเพื่อปกป้องข้อศอก
+Bodyweight Triceps Extension|ใช้น้ำหนักตัวเหยียดแขนบนบาร์ต่ำ ฝึกหลังแขน
+Resistance Band Pushdown|ดันยางยืดลง ฝึกหลังแขนที่บ้าน
+Resistance Band Overhead Extension|เหยียดแขนเหนือศีรษะด้วยยาง ยืดหัวยาว
+Landmine Triceps Extension|เหยียดแขนด้วยบาร์ Landmine มุมแรงต้านต่างจากปกติ
+Incline Dumbbell Triceps Extension|นอนม้าเอียงเหยียดแขน ยืดหัวยาวเต็มที่
+Crunch|ยกไหล่ขึ้นจากพื้น เน้นหน้าท้องส่วนบน
+Sit-Up|ลุกนั่งเต็มช่วง ใช้หน้าท้องและสะโพก
+V-Up|ยกแขนขาพร้อมกันเป็นรูปตัว V ฝึกหน้าท้องและความยืดหยุ่น
+Toe Touch|นอนยกขาแล้วเอื้อมมือแตะปลายเท้า เน้นหน้าท้องบน
+Leg Raise|นอนยกขาขึ้น เน้นหน้าท้องส่วนล่าง
+Knee Raise|ยกเข่าเข้าหาอก ท่าง่ายสำหรับหน้าท้องล่าง
+Pallof Press|ดันเคเบิลต้านการหมุน ฝึกแกนกลางต้านแรงบิด
+Hollow Body Hold|นอนยกไหล่และขาลอย ค้างตัวโค้ง ฝึกแกนกลางแบบยิมนาสติก
+Hollow Rock|โยกตัวในท่า Hollow ฝึกแกนกลางแบบไดนามิก
+Bear Crawl|คลานสี่ขายกเข่าลอย ฝึกแกนกลางและไหล่
+Suitcase Carry|ถือน้ำหนักข้างเดียวเดิน ต้านการเอียงลำตัว
+Farmer Carry|ถือน้ำหนักสองข้างเดิน ฝึกแรงบีบมือ แกนกลาง และหลังบน
+Turkish Get-Up|ลุกขึ้นจากนอนถือน้ำหนักเหนือศีรษะ ฝึกความมั่นคงทั้งร่างกาย
+Muscle-Up|ดึงตัวขึ้นแล้วเปลี่ยนมือเป็นดันเหนือบาร์ ท่าขั้นสูง
+Bar Dips|ดิปบนบาร์ ฝึกอก ไหล่ และหลังแขน
+Australian Pull-Up|ดึงตัวในแนวนอนใต้บาร์ต่ำ ท่าเริ่มต้นสร้างหลัง
+Ring Dips|ดิปบนห่วง เพิ่มความไม่มั่นคง ฝึกอกและไหล่
+Ring Row|พายตัวบนห่วง ปรับความยากด้วยองศาลำตัว
+Archer Push-Up|วิดพื้นเลื่อนน้ำหนักไปข้างเดียว ท่าสู่การวิดพื้นมือเดียว
+Pseudo Planche Push-Up|วิดพื้นโน้มไหล่ไปข้างหน้า เสริมความแข็งแรงสู่ Planche
+Clapping Push-Up|วิดพื้นดันแรงจนตบมือกลางอากาศ ฝึกพลังระเบิดอก
+L-Sit|ค้างตัวยกขาตรงเหนือพื้น ฝึกหน้าท้อง สะโพก และหลังแขน
+Handstand Hold|ยืนด้วยมือค้าง ฝึกไหล่และการทรงตัว
+Front Lever|ค้างตัวขนานพื้นหน้าบาร์ ฝึกหลังและแกนกลางขั้นสูง
+Back Lever|ค้างตัวขนานพื้นหลังบาร์ ฝึกไหล่และแกนกลางขั้นสูง
+Human Flag|ค้างตัวแนวนอนบนเสา ฝึกแกนกลางด้านข้างและไหล่ขั้นสูง
+Planche Lean|โน้มตัวไปข้างหน้าบนมือ ฝึกพื้นฐานท่า Planche
+Typewriter Pull-Up|ดึงตัวขึ้นแล้วเลื่อนซ้ายขวา เพิ่มภาระให้หลัง
+Toes to Bar|ห้อยบาร์ยกเท้าแตะบาร์ ฝึกหน้าท้องและแรงบีบมือ
+Skin the Cat|ห้อยบาร์ม้วนตัวผ่านแขน ฝึกความแข็งแรงและความยืดหยุ่นไหล่
+Shrimp Squat|สควอตขาเดียวจับเท้าหลัง ฝึกหน้าขาและทรงตัว
+Burpee|ย่อ วิดพื้น กระโดด ท่าฝึกทั้งตัวและหัวใจ
+Run 1 km Interval|วิ่ง 1 กม. คั่นระหว่างแต่ละสถานี ฝึกความทนทานแบบ Hyrox
+SkiErg|ดึงเครื่องสกีเออร์โกจากบนลงล่าง ใช้หลัง ไหล่ และแกนกลาง (สถานี Hyrox)
+Sled Pull|ดึงเลื่อนด้วยเชือกทีละช่วง ใช้หลัง หน้าแขน และขา (สถานี Hyrox)
+Burpee Broad Jump|เบอร์ปี้ต่อด้วยกระโดดไกล ใช้ทั้งตัว (สถานี Hyrox)
+Rowing Machine|พายเครื่อง 1,000 ม. ใช้หลัง ขา และหัวใจ (สถานี Hyrox)
+Sandbag Lunge|ลันจ์ถือกระสอบทราย 100 ม. ฝึกขาและก้น (สถานี Hyrox)
+Wall Ball|ย่อตัวโยนบอลขึ้นกำแพง ใช้ขา ไหล่ และหัวใจ (สถานี Hyrox)
+Sandbag Ground-to-Shoulder|ยกกระสอบทรายจากพื้นขึ้นบ่า ฝึกพลังทั้งตัวสำหรับ Hyrox
+Sandbag Carry|แบกกระสอบทรายเดิน ฝึกแกนกลางและความทนทาน
+Assault Bike|ปั่นแอสซอลต์ไบค์ ฝึกความทนทานและพลังงานระบบแอโรบิก
+Box Step-Over|ก้าวข้ามกล่อง ฝึกขา ก้น และความทนทาน
+Weighted Vest Run|วิ่งสวมเสื้อถ่วง ฝึกความทนทานและแรงขา
+Hyrox Simulation|ซ้อมสลับวิ่งกับสถานีต่อเนื่อง เหมือนการแข่งจริง`.split('\n').forEach(l=>{const a=l.split('|');if(a[1])DX[nk(a[0])]=a[1];});
+const EXDB={};Object.keys(NEWX).forEach(g=>EXDB[g]=NEWX[g].split('|').map(n=>[n,D0[nk(n)]||DX[nk(n)]||'ท่าสำหรับ'+g]));
+EXDB["คาร์ดิโอ"]=EXOLD["คาร์ดิโอ"];
+const MUSCLES=Object.keys(EXDB);
+const DESC={};Object.keys(EXOLD).forEach(m=>EXOLD[m].forEach(e=>DESC[e[0]]={mus:m,d:e[1]}));MUSCLES.forEach(m=>EXDB[m].forEach(e=>DESC[e[0]]={mus:m,d:e[1]}));
+
+/* ===== STATE ===== */
+const K='trainerDash_v2';
+let db;try{db=JSON.parse(localStorage.getItem(K)||'null')}catch(e){db=null}
+db=db||{clients:[],sessions:[],body:[],cur:null};
+let editing=null, charts={}, curMus=MUSCLES[0];
+const save=()=>{if(window.RO)return;try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}cloudSave();};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const today=()=>new Date().toISOString().slice(0,10);
+const C=()=>db.clients.find(c=>c.id===db.cur);
+const num=v=>parseFloat(v)||0;
+const fmt=n=>n.toLocaleString('th-TH',{maximumFractionDigits:1});
+const esc=s=>String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+
+/* ===== EXERCISE PICKER ===== */
+function buildLib(){
+  mgroup.innerHTML=MUSCLES.map(m=>'<div class="mg'+(m===curMus?' on':'')+'" onclick="pickMus(\''+m+'\')">'+m+' <b>'+EXDB[m].length+'</b></div>').join('');
+  tMus.innerHTML=MUSCLES.map(m=>'<option>'+m+'</option>').join('');
+  exList.innerHTML=[...new Set(MUSCLES.flatMap(m=>EXDB[m].map(e=>e[0])))].map(n=>'<option value="'+n.replace(/"/g,'')+'">').join('');
+  renderEx();
+}
+function pickMus(m){curMus=m;exSearch.value='';buildLib();}
+function renderEx(){
+  const q=exSearch.value.trim().toLowerCase();
+  let list=q?MUSCLES.flatMap(m=>EXDB[m].filter(e=>e[0].toLowerCase().includes(q)||e[1].includes(q)).map(e=>[e[0],e[1],m])):EXDB[curMus].map(e=>[e[0],e[1],curMus]);
+  exgrid.innerHTML=list.map(e=>'<div class="exc'+(tEx.value===e[0]?' sel':'')+'" onclick="chooseEx(\''+esc(e[0])+'\',\''+e[2]+'\')"><div class="n">'+e[0]+'</div><div class="d">'+e[1]+(q?' · <span style="color:var(--y2);font-weight:500">'+e[2]+'</span>':'')+'</div></div>').join('')||'<div class="empty">ไม่พบท่าที่ค้นหา</div>';
+}
+function chooseEx(n,m){
+  if(tplMode){if(tplDraft.indexOf(n)<0)tplDraft.push(n);renderDraft();return;}
+  tEx.value=n;tMus.value=m;
+  const d=DESC[n];exHint.className='hint';exHint.innerHTML='<b>'+n+'</b> — '+(d?d.d:'');
+  renderEx();document.getElementById('sets').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ===== CLIENTS ===== */
+function newClient(){editing=null;['cName','cPhone','cAge','cH','cMed'].forEach(i=>document.getElementById(i).value='');cTotal.value=12;cStart.value=today();}
+function saveClient(){
+  const n=cName.value.trim(); if(!n)return alert('กรุณาใส่ชื่อลูกค้า');
+  const o={id:editing||uid(),name:n,phone:cPhone.value,age:num(cAge.value),sex:cSex.value,h:num(cH.value),goal:cGoal.value,total:num(cTotal.value)||12,start:cStart.value||today(),med:cMed.value};
+  if(editing)Object.assign(db.clients.find(c=>c.id===editing),o);else{db.clients.push(o);db.cur=o.id;}
+  editing=null;save();render();alert('บันทึกแล้ว');
+}
+function editClient(id){const c=db.clients.find(x=>x.id===id);editing=id;cName.value=c.name;cPhone.value=c.phone||'';cAge.value=c.age;cSex.value=c.sex;cH.value=c.h;cGoal.value=c.goal;cTotal.value=c.total;cStart.value=c.start;cMed.value=c.med||'';tab('client');}
+function delClient(){if(!db.cur||!confirm('ลบลูกค้าและข้อมูลทั้งหมด?'))return;db.sessions=db.sessions.filter(s=>s.cid!==db.cur);db.body=db.body.filter(b=>b.cid!==db.cur);db.clients=db.clients.filter(c=>c.id!==db.cur);db.cur=db.clients[0]?db.clients[0].id:null;save();render();}
+function switchClient(id){db.cur=id;save();render();}
+
+/* ===== SETS ===== */
+const RH=44;let EFF={rir:0,rpe:0,tech:''};
+const TECH=[{k:'normal',n:'Normal Set',d:'ยกปกติ (Straight Set) จนหมดแรง'},
+{k:'super',n:'Superset',d:'เล่นสองท่าติดกันโดยไม่พักเซ็ต'},
+{k:'drop',n:'Drop Set',d:'ลดน้ำหนักลงเรื่อย ๆ 2-5 ชุดน้ำหนัก'},
+{k:'giant',n:'Giant Set',d:'เล่น 3-4 ท่าต่อเนื่องโดยไม่พัก เหมาะกับกล้ามเนื้อกลุ่ม High Rep'},
+{k:'myo',n:'Myo Rep',d:'เล่นเซ็ตปกติจนหมดแรง หายใจ 3-5 ลมหายใจ แล้วทำซ้ำเพื่อสะสม 3-5 mini set'},
+{k:'rest',n:'Rest-Pause',d:'ยกจนเกือบหมดแรง พัก 10-15 วินาที แล้วยกต่อด้วยน้ำหนักเดิมอีก 2-3 ครั้ง'},
+{k:'iso',n:'Isometric Hold',d:'ยกค้างไว้ในจุดที่ยากที่สุด'}];
+const TN={};TECH.forEach(t=>TN[t.k]=t.n);
+function pickT(el){const v=pickOne(el);EFF.tech=v?TECH[v-1].k:'';techHint.textContent=v?TECH[v-1].n+' — '+TECH[v-1].d:'';}
+const chips=(a,b,fn)=>{let h='';for(let i=a;i<=b;i++)h+='<span class="chip" data-v="'+i+'" onclick="'+fn+'(this)">'+i+'</span>';return h;};
+function pickOne(el){const on=el.classList.contains('on');el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));if(!on)el.classList.add('on');return on?0:+el.dataset.v;}
+function pickE(el){EFF[el.parentNode.dataset.e]=pickOne(el);}
+function pickR(el){const row=el.closest('.setrow2');row.dataset.r=pickOne(el);const q=row.querySelector('select');if(q)q.value='';}
+function moreR(q){const row=q.closest('.setrow2');row.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));row.dataset.r=q.value||0;}
+function rs(el){const m=+el.dataset.max||100,n=+el.dataset.min||0,st=+el.dataset.step||1;el.dataset.v=Math.min(m,Math.max(n,+(n+Math.round(el.scrollTop/RH)*st).toFixed(1)));}
+const rollerH=(k,v,m,l,n,st)=>{st=st||1;let o='';for(let i=n;i<=m;i=+(i+st).toFixed(1))o+='<div>'+(k==='w'&&i===0?'BW':i)+'</div>';return '<div class="sw"><label>'+l+'</label><div class="rw"><div class="roller" data-k="'+k+'" data-min="'+n+'" data-step="'+st+'" data-max="'+m+'" data-v="'+v+'" onscroll="rs(this)">'+o+'</div></div></div>';};
+function pickF(el){el.closest('.setrow2').dataset.f=pickOne(el);}
+function syncRollers(){document.querySelectorAll('#sets .roller').forEach(el=>{if(el.dataset.ok!=='1'&&el.offsetParent){el.scrollTop=((+el.dataset.v-(+el.dataset.min||0))/(+el.dataset.step||1))*RH;el.dataset.ok='1';}});}
+function buildChips(){nChips.innerHTML=chips(1,5,'setN');rirChips.innerHTML=chips(1,5,'pickE');rpeChips.innerHTML=chips(1,10,'pickE');techChips.innerHTML=TECH.map((t,i)=>'<span class="chip" data-v="'+(i+1)+'" onclick="pickT(this)">'+t.n+'</span>').join('');}
+function resetEff(){EFF={rir:0,rpe:0,tech:''};techHint.textContent='';document.querySelectorAll('#rirChips .chip,#rpeChips .chip,#techChips .chip').forEach(c=>c.classList.remove('on'));}
+function addSet(w,r){
+  const rows=document.querySelectorAll('#sets .setrow2'),last=rows[rows.length-1];
+  w=w||(last?+last.querySelector('[data-k=w]').dataset.v:20);
+  r=r||(last?+last.querySelector('[data-k=r]').dataset.v:10);
+  const d=document.createElement('div');d.className='setrow2';d.dataset.f=0;
+  d.innerHTML='<div class="sh"><b></b><span class="x" onclick="this.closest(\'.setrow2\').remove();renumber()">×</span></div>'+rollerH('w',w,200,'น้ำหนัก (kg) — BW = น้ำหนักตัว (ครั้งละ 0.5)',0,0.5)+rollerH('r',r,50,'จำนวนครั้ง (reps)',0)+'<div class="sr"><label>ฟอร์มเซ็ตนี้</label><div class="chips"><span class="chip f1" data-v="1" onclick="pickF(this)">ดี</span><span class="chip f2" data-v="2" onclick="pickF(this)">พอใช้</span><span class="chip f3" data-v="3" onclick="pickF(this)">ต้องแก้ไข</span></div></div>';
+  document.getElementById('sets').appendChild(d);renumber();syncRollers();
+}
+/* ===== DAILY REPORT ===== */
+const FL={1:'ดี',2:'พอใช้',3:'ต้องแก้ไข'},PL={keep:'คงน้ำหนักเดิม',up:'เพิ่มน้ำหนัก',form:'แก้ฟอร์ม'};
+const curSess=()=>{const td=tDate.value||today();return db.sessions.find(x=>x.cid===db.cur&&x.date===td);};
+function renderDaily(){
+  const s=curSess();drDate.textContent=tDate.value||today();
+  if(!s||!s.items.length){dailyBody.innerHTML='<div class="empty">ยังไม่มีท่าที่บันทึกวันนี้</div>';drNote.value='';return;}
+  if(document.activeElement!==drNote)drNote.value=s.report||'';
+  const tv=s.items.reduce((a,i)=>a+vol(i),0),ns=s.items.reduce((a,i)=>a+i.sets.length,0),nf=s.items.reduce((a,i)=>a+i.sets.filter(x=>x.f===3).length,0);
+  dailyBody.innerHTML='<div class="sub" style="margin-bottom:10px">'+s.items.length+' ท่า • '+ns+' เซ็ต • Volume '+fmt(tv)+' kg'+(nf?' • ต้องแก้ฟอร์ม '+nf+' เซ็ต':'')+'</div>'+s.items.map(i=>'<div class="tqi" style="display:block;cursor:default"><b>'+i.ex+'</b><div>'+i.sets.map((x,k)=>'<span class="ft f'+(x.f||0)+'">'+(k+1)+') '+(x.w||'BW')+'×'+x.r+(x.f?' '+FL[x.f]:'')+'</span>').join('')+'</div><div class="sub">'+(i.tech?TN[i.tech]+' • ':'')+(i.rir?'RIR '+i.rir+' ':'')+(i.rpe?'RPE '+i.rpe:'')+'</div><label>แพลนครั้งหน้า</label><div class="chips" style="margin:4px 0 0">'+['keep','up','form'].map(k=>'<span class="chip pl'+(i.plan===k?' on':'')+'" onclick="setPlan(\''+i.id+'\',\''+k+'\')">'+PL[k]+'</span>').join('')+'</div></div>').join('');
+}
+function setPlan(id,k){const i=curSess().items.find(x=>x.id===id);i.plan=i.plan===k?'':k;save();renderDaily();}
+function saveDrNote(){const s=curSess();if(s){s.report=drNote.value;save();}}
+function copyDaily(){const s=curSess();if(!s)return;const c=C()||{};
+  const t='Biggy Trainer — รายงานประจำวัน\nลูกค้า: '+(c.name||'')+'\nวันที่: '+s.date+'\n\n'+s.items.map(i=>'• '+i.ex+': '+i.sets.map(x=>(x.w||'BW')+'×'+x.r+(x.f?'('+FL[x.f]+')':'')).join(', ')+(i.tech?' | '+TN[i.tech]:'')+(i.rir?' | RIR '+i.rir:'')+(i.rpe?' | RPE '+i.rpe:'')+(i.plan?'\n  แพลนครั้งหน้า: '+PL[i.plan]:'')).join('\n')+(s.report?'\n\nสรุป: '+s.report:'');
+  try{navigator.clipboard.writeText(t).then(()=>alert('คัดลอกรายงานแล้ว'));}catch(e){}}
+/* ===== TEMPLATE EDIT ===== */
+let editTplId=null;
+function editTpl(){const t=tpls().find(x=>x.id===curTpl);if(!t)return;if(tplMode)toggleTplMode();toggleTplMode();tplDraft=t.items.slice();tplName.value=t.name;editTplId=t.id;btnTplMode.textContent='✕ ยกเลิกการแก้ไข';renderDraft();tplBuilder.scrollIntoView({behavior:'smooth',block:'center'});}
+function renumber(){const rows=document.querySelectorAll('#sets .setrow2');rows.forEach((d,i)=>d.querySelector('.sh b').textContent='เซ็ต '+(i+1));document.querySelectorAll('#nChips .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===rows.length));}
+function setN(el){const n=+el.dataset.v;while(document.querySelectorAll('#sets .setrow2').length<n)addSet();let r=document.querySelectorAll('#sets .setrow2');while(r.length>n){r[r.length-1].remove();r=document.querySelectorAll('#sets .setrow2');}renumber();}
+
+/* ===== TEMPLATES ===== */
+const TPL0={"Push":["Barbell Bench Press","Incline Dumbbell Press","Barbell Overhead Press","Dumbbell Lateral Raise","Rope Pushdown"],
+"Pull":["Lat Pulldown","Barbell Row","Seated Cable Row","Face Pull","Barbell Curl","Hammer Curl"],
+"Leg":["Back Squat","Romanian Deadlift","Leg Press","Lying Leg Curl","Standing Calf Raise"],
+"Chest + Bicep":["Barbell Bench Press","Incline Dumbbell Press","Cable Fly","Barbell Curl","Incline Dumbbell Curl"],
+"Back + Shoulder":["Lat Pulldown","Barbell Row","Barbell Overhead Press","Dumbbell Lateral Raise","Rear Delt Fly"],
+"Leg + Tricep":["Back Squat","Leg Press","Romanian Deadlift","EZ-Bar Skull Crusher","Rope Pushdown"]};
+let tplMode=false,tplDraft=[],curTpl=null;
+const tpls=()=>{if(!db.tpl)db.tpl=Object.keys(TPL0).map(n=>({id:uid(),name:n,items:TPL0[n]}));if(!db.tplV2){db.tpl.forEach(t=>{if(TPL0[t.name])t.items=TPL0[t.name].slice();});db.tplV2=1;save();}return db.tpl;};
+function renderTpl(){
+  tplList.innerHTML=tpls().map(t=>'<div class="mg'+(t.id===curTpl?' on':'')+'" onclick="pickTpl(\''+t.id+'\')">'+t.name+' <b>'+t.items.length+'</b></div>').join('');
+  const t=tpls().find(x=>x.id===curTpl);
+  if(!t){tplQueue.innerHTML='';return;}
+  const td=tDate.value||today(),ss=db.sessions.find(x=>x.cid===db.cur&&x.date===td),done=n=>ss&&ss.items.some(i=>i.ex===n),dn=t.items.filter(done).length;
+  tplQueue.innerHTML='<div class="sub" style="margin:4px 0 6px">ทำแล้ว '+dn+'/'+t.items.length+' ท่า — แตะท่าเพื่อบันทึก</div><div class="bar" style="margin:0 0 12px"><i style="width:'+(dn/t.items.length*100)+'%"></i></div>'+t.items.map((n,i)=>'<div class="tqi'+(done(n)?' done':'')+'" onclick="tplPick('+i+')"><span>'+(done(n)?'✔ ':'')+n+'</span><small>'+(DESC[n]?DESC[n].mus:'')+'</small></div>').join('')+'<div class="chips" style="margin:6px 0 0"><button class="ghost" onclick="editTpl()">แก้ไขเทมเพลต</button><button class="red" onclick="delTpl()">ลบ</button></div>';
+}
+function pickTpl(id){curTpl=curTpl===id?null:id;const t=tpls().find(x=>x.id===curTpl);if(t)tFocus.value=t.name;renderTpl();}
+function tplPick(i){const t=tpls().find(x=>x.id===curTpl),n=t.items[i];chooseEx(n,DESC[n]?DESC[n].mus:tMus.value);}
+function toggleTplMode(){editTplId=null;tplMode=!tplMode;tplBuilder.classList.toggle('hide',!tplMode);btnTplMode.textContent=tplMode?'✕ ปิดโหมดสร้างเทมเพลต':'＋ สร้างเทมเพลตใหม่';if(tplMode){tplDraft=[];tplName.value='';}renderDraft();}
+function renderDraft(){tplDraftBox.innerHTML=tplDraft.map((n,i)=>'<div class="tqi"><span>'+(i+1)+'. '+n+'</span>'+(i?'<span class="x" onclick="tplDraft.splice('+(i-1)+',0,tplDraft.splice('+i+',1)[0]);renderDraft()">↑</span>':'')+'<span class="x" onclick="tplDraft.splice('+i+',1);renderDraft()">×</span></div>').join('')||'<div class="empty">ยังไม่มีท่า — แตะท่าจากคลังด้านล่าง</div>';}
+function saveTpl(){const name=tplName.value.trim();if(!name||!tplDraft.length)return alert('ตั้งชื่อและเลือกอย่างน้อย 1 ท่า');let t=editTplId&&tpls().find(x=>x.id===editTplId);if(t){t.name=name;t.items=tplDraft.slice();}else{t={id:uid(),name,items:tplDraft.slice()};tpls().push(t);}save();curTpl=t.id;tFocus.value=name;toggleTplMode();renderTpl();}
+function delTpl(){if(!confirm('ลบเทมเพลตนี้?'))return;db.tpl=tpls().filter(x=>x.id!==curTpl);curTpl=null;save();renderTpl();}
+
+function saveEx(){
+  if(!db.cur)return alert('เลือกลูกค้าก่อน');
+  const ex=tEx.value.trim(); if(!ex)return alert('เลือกหรือพิมพ์ชื่อท่า');
+  const sets=[...document.querySelectorAll('#sets .setrow2')].map(r=>({w:+r.querySelector('[data-k=w]').dataset.v,r:+r.querySelector('[data-k=r]').dataset.v,f:+r.dataset.f||0}));
+  if(!sets.length)return alert('ใส่อย่างน้อย 1 เซ็ต');
+  const date=tDate.value||today();
+  let s=db.sessions.find(x=>x.cid===db.cur&&x.date===date);
+  if(!s){s={id:uid(),cid:db.cur,date,focus:tFocus.value,items:[]};db.sessions.push(s);}
+  else if(tFocus.value)s.focus=tFocus.value;
+  s.items.push({id:uid(),ex,mus:tMus.value,sets,by:(window.ME&&window.ME.name)||'',tech:EFF.tech||'',rir:EFF.rir,rpe:EFF.rpe,note:tNote.value});
+  tEx.value='';tNote.value='';resetEff();exHint.className='hint hide';
+  document.getElementById('sets').innerHTML='';addSet();addSet();addSet();
+  save();render();
+  if(autoRest.checked){setT(T.total);document.getElementById('timerCard').scrollIntoView({behavior:'smooth',block:'center'});}
+}
+function renewClient(id){const c=db.clients.find(x=>x.id===id);if(!c)return;const d=db.sessions.filter(s=>s.cid===id).length;
+  const n=parseInt(prompt('ต่ออายุ: ซื้อชั่วโมงเทรนเพิ่มกี่ครั้ง?\n('+c.name+' ใช้แล้ว '+d+' จาก '+c.total+' ครั้ง)','12'),10);
+  if(!(n>0))return;c.rn=c.rn||[];c.rn.push({date:today(),add:n,from:c.total});c.total=(+c.total||0)+n;save();render();}
+function renameItem(sid,iid){const s=db.sessions.find(x=>x.id===sid),i=s&&s.items.find(y=>y.id===iid);if(!i)return;
+  const n=(prompt('แก้ไขชื่อท่า',i.ex)||'').trim();if(!n||n===i.ex)return;
+  const old=i.ex,same=[];db.sessions.forEach(x=>{if(x.cid===s.cid)x.items.forEach(y=>{if(y.ex===old&&y!==i)same.push(y);});});
+  let all=false;if(same.length)all=confirm('ท่า "'+old+'" ยังบันทึกอยู่อีก '+same.length+' รายการ\nเปลี่ยนเป็น "'+n+'" ทั้งหมดไหม?\n(ตกลง = เปลี่ยนทั้งหมด, ยกเลิก = เฉพาะรายการนี้)');
+  const set=y=>{y.ex=n;if(DESC[n])y.mus=DESC[n].mus;};set(i);if(all)same.forEach(set);save();render();}
+function delItem(sid,iid){const s=db.sessions.find(x=>x.id===sid);s.items=s.items.filter(i=>i.id!==iid);if(!s.items.length)db.sessions=db.sessions.filter(x=>x.id!==sid);save();render();}
+
+/* ===== BODY ===== */
+function saveBody(){
+  if(!db.cur)return alert('เลือกลูกค้าก่อน');
+  const date=bDate.value||today();
+  const o={id:uid(),cid:db.cur,date,w:num(bW.value),bf:num(bF.value),mm:num(bM.value),chest:num(bChest.value),waist:num(bWaist.value),hip:num(bHip.value),arm:num(bArm.value),thigh:num(bThigh.value)};
+  const ex=db.body.find(b=>b.cid===db.cur&&b.date===date);
+  if(ex)Object.assign(ex,o,{id:ex.id});else db.body.push(o);
+  save();render();alert('บันทึกแล้ว');
+}
+function delBody(id){db.body=db.body.filter(b=>b.id!==id);save();render();}
+
+/* ===== CALC ===== */
+const vol=i=>i.sets.reduce((a,s)=>a+s.w*s.r,0);
+const orm=s=>s.w*(1+s.r/30);
+const bestORM=i=>Math.max.apply(null,i.sets.map(orm));
+
+/* ===== RENDER ===== */
+function tab(t){
+  document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  ['dash','report','train','body','hist','client'].forEach(x=>document.getElementById('p-'+x).classList.toggle('hide',x!==t));
+  document.querySelectorAll('#bnav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  scrollTo({top:0});if(t==='train')syncRollers();
+  if(t==='report') renderReportCharts();
+}
+
+function render(){
+  clientSel.innerHTML=db.clients.map(c=>'<option value="'+c.id+'"'+(c.id===db.cur?' selected':'')+'>'+c.name+'</option>').join('')||'<option>— ยังไม่มีลูกค้า —</option>';
+  clientBody.innerHTML=db.clients.map(c=>{const d=db.sessions.filter(s=>s.cid===c.id).length;return '<tr><td>'+c.name+'</td><td>'+c.goal+'</td><td><span class="pill"'+(c.total-d<=2?' style="background:rgba(255,90,77,.25)"':'')+'>'+d+'/'+c.total+'</span>'+(c.rn&&c.rn.length?'<div class="sub">ต่ออายุ '+c.rn.length+' ครั้ง • ล่าสุด '+c.rn[c.rn.length-1].date+' (+'+c.rn[c.rn.length-1].add+')</div>':'')+'</td><td><button class="ghost" onclick="editClient(\''+c.id+'\')">แก้ไข</button> <button onclick="renewClient(\''+c.id+'\')">ต่ออายุ</button></td></tr>'}).join('')||'<tr><td colspan="4" class="empty">ยังไม่มีลูกค้า</td></tr>';
+  const c=C();
+  clientInfo.textContent=c?(c.sex+' • '+c.age+' ปี • '+c.h+' ซม. • '+c.goal+(c.med?' • ⚠ '+c.med:'')):'';
+  const ss=db.sessions.filter(s=>s.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+  const bb=db.body.filter(b=>b.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+
+  const tv=ss.reduce((a,s)=>a+s.items.reduce((x,i)=>x+vol(i),0),0);
+  kSess.textContent=ss.length; kVol.textContent=fmt(tv);
+  if(c){const p=Math.min(100,ss.length/c.total*100);kBar.style.width=p+'%';kLeft.textContent='เหลืออีก '+Math.max(0,c.total-ss.length)+' ครั้ง ('+p.toFixed(0)+'%)';}
+  if(bb.length){const f=bb[0],l=bb[bb.length-1],d=l.w-f.w;
+    kBW.textContent=l.w+' kg';
+    kBWd.innerHTML=bb.length>1?'<span class="'+(d<0?'up':'down')+'">'+(d>0?'+':'')+d.toFixed(1)+' kg จากวันแรก</span>':'ค่าเริ่มต้น';
+    const bmi=c&&c.h?l.w/Math.pow(c.h/100,2):0;
+    kBF.textContent=(l.bf||'–')+'%';
+    kBFd.textContent='BMI '+(bmi?bmi.toFixed(1):'–')+(bb.length>1&&l.bf&&f.bf?' • ไขมัน '+(l.bf-f.bf>0?'+':'')+(l.bf-f.bf).toFixed(1)+'%':'');
+  }else{kBW.textContent='–';kBWd.textContent='';kBF.textContent='–';kBFd.textContent='';}
+
+  const td=tDate.value||today(), ts=ss.find(s=>s.date===td);
+  todayBody.innerHTML=ts?ts.items.map(i=>'<tr><td><b>'+i.ex+'</b><div class="sub">'+i.mus+(i.tech?' • '+TN[i.tech]:'')+(i.rir?' • RIR '+i.rir:'')+(i.rpe?' • RPE '+i.rpe:'')+(i.note?' • '+i.note:'')+'</div></td><td>'+i.sets.map(s=>(s.w||'BW')+'×'+s.r+(s.f?['','✅','🟡','🔴'][s.f]:'')).join(', ')+'</td><td><span class="pill">'+fmt(vol(i))+'</span></td><td style="white-space:nowrap"><div class="x" style="display:inline-block" onclick="renameItem(\''+ts.id+'\',\''+i.id+'\')">✎</div> <div class="x" style="display:inline-block" onclick="delItem(\''+ts.id+'\',\''+i.id+'\')">×</div></td></tr>').join(''):'<tr><td colspan="4" class="empty">ยังไม่มีท่าในวันนี้</td></tr>';
+  todayVol.textContent=fmt(ts?ts.items.reduce((a,i)=>a+vol(i),0):0)+' kg';
+
+  bodyBody.innerHTML=bb.slice().reverse().map(b=>'<tr><td>'+b.date+'</td><td>'+(b.w||'–')+'</td><td>'+(b.bf||'–')+'</td><td>'+(b.mm||'–')+'</td><td>'+(b.chest||'–')+'</td><td>'+(b.waist||'–')+'</td><td>'+(b.hip||'–')+'</td><td>'+(b.arm||'–')+'</td><td>'+(b.thigh||'–')+'</td><td><div class="x" onclick="delBody(\''+b.id+'\')">×</div></td></tr>').join('')||'<tr><td colspan="10" class="empty">ยังไม่มีข้อมูล</td></tr>';
+
+  histBody.innerHTML=ss.slice().reverse().map(s=>'<div style="border-bottom:1px solid var(--line2);padding:16px 0"><b style="font-family:var(--fh);font-size:17px">'+s.date+'</b> <span class="pill">'+(s.focus||'Session')+'</span> <span class="sub">Volume '+fmt(s.items.reduce((a,i)=>a+vol(i),0))+' kg</span><table style="margin-top:10px"><tbody>'+s.items.map(i=>'<tr><td style="width:28%"><b>'+i.ex+'</b> <span class="x" style="display:inline-block;padding:2px 8px" onclick="renameItem(\''+s.id+'\',\''+i.id+'\')">✎</span> <span class="sub">('+i.mus+')</span></td><td>'+i.sets.map(x=>(x.w?x.w+'kg':'BW')+' × '+x.r+(x.f?['','✅','🟡','🔴'][x.f]:'')).join('  |  ')+'</td><td style="width:14%">'+fmt(vol(i))+' kg</td><td class="sub">'+(i.tech?TN[i.tech]+' ':'')+(i.plan?'→ '+PL[i.plan]+' ':'')+(i.rir?'RIR '+i.rir+' ':'')+(i.rpe?'RPE '+i.rpe+' ':'')+(i.note||'')+(i.by?' · '+i.by:'')+'</td></tr>').join('')+'</tbody></table></div>').join('')||'<div class="empty">ยังไม่มีประวัติการเทรน</div>';
+
+  const exs={};
+  ss.forEach(s=>s.items.forEach(i=>{const o=exs[i.ex]=exs[i.ex]||{mus:i.mus,max:0,orm:0,vol:0,last:'',pts:[]};
+    o.mus=i.mus;o.max=Math.max.apply(null,[o.max].concat(i.sets.map(x=>x.w)));o.orm=Math.max(o.orm,bestORM(i));o.vol+=vol(i);o.last=s.date;o.pts.push({x:s.date,y:+bestORM(i).toFixed(1)});}));
+  const keys=Object.keys(exs), prev=exSel.value;
+  exSel.innerHTML=keys.map(k=>'<option>'+k+'</option>').join('')||'<option>—</option>';
+  if(keys.indexOf(prev)>-1)exSel.value=prev;
+  prBody.innerHTML=keys.sort((a,b)=>exs[b].vol-exs[a].vol).map(k=>'<tr><td><b>'+k+'</b></td><td>'+exs[k].mus+'</td><td>'+exs[k].max+' kg</td><td style="color:var(--y-txt);font-weight:600">'+exs[k].orm.toFixed(1)+' kg</td><td>'+fmt(exs[k].vol)+'</td><td class="sub">'+exs[k].last+'</td></tr>').join('')||'<tr><td colspan="6" class="empty">ยังไม่มีข้อมูล</td></tr>';
+
+  draw(ss,bb,exs);
+  renderTpl();
+  renderDaily();
+}
+
+/* ===== CHARTS ===== */
+const VW=()=>innerWidth<600?'s':innerWidth<1024?'m':'l';
+const P=['#FFC300','#E8A200','#B8860B','#8A8D96','#FFDE6A','#F97316','#C4C7CE','#A67C00'];
+function mk(id,cfg){Chart.defaults.aspectRatio={s:1.2,m:1.6,l:2}[VW()];if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+const OPT=y2=>({responsive:true,plugins:{legend:{labels:{color:'#4A4944',boxWidth:14,font:{family:'Anuphan',size:14}}},tooltip:{backgroundColor:'#23252A',titleFont:{family:'Anuphan',size:14},bodyFont:{family:'Anuphan',size:14},padding:10}},scales:Object.assign({x:{ticks:{color:'#7A786F',font:{family:'Anuphan',size:13}},grid:{color:'#E2D8B8'}},y:{ticks:{color:'#7A786F',font:{family:'Anuphan',size:13}},grid:{color:'#E2D8B8'}}},y2?{y1:{position:'right',ticks:{color:'#E8A200',font:{family:'Anuphan',size:13}},grid:{display:false}}}:{})});
+
+function draw(ss,bb,exs){
+  if(!ss){ss=db.sessions.filter(s=>s.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+    bb=db.body.filter(b=>b.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+    exs={};ss.forEach(s=>s.items.forEach(i=>{exs[i.ex]=exs[i.ex]||{pts:[]};exs[i.ex].pts.push({x:s.date,y:+bestORM(i).toFixed(1)})}));}
+
+  mk('cBody',{type:'line',data:{labels:bb.map(b=>b.date),datasets:[
+    {label:'น้ำหนัก (kg)',data:bb.map(b=>b.w),borderColor:'#E8A200',backgroundColor:'rgba(255,195,0,.20)',tension:.35,fill:true,borderWidth:3,pointBackgroundColor:'#E8A200',pointRadius:4},
+    {label:'ไขมัน (%)',data:bb.map(b=>b.bf),borderColor:'#F97316',yAxisID:'y1',tension:.35,borderWidth:2.5,borderDash:[6,4]},
+    {label:'มวลกล้ามเนื้อ (kg)',data:bb.map(b=>b.mm),borderColor:'#8A8D96',tension:.35,borderWidth:2.5}]},options:OPT(1)});
+
+  mk('cVol',{type:'bar',data:{labels:ss.map(s=>s.date),datasets:[{label:'Volume (kg)',data:ss.map(s=>s.items.reduce((a,i)=>a+vol(i),0)),backgroundColor:'#FFC300',borderRadius:6,hoverBackgroundColor:'#E8A200'}]},options:OPT()});
+
+  const sel=exSel.value,p=exs[sel]?exs[sel].pts:[];
+  mk('c1RM',{type:'line',data:{labels:p.map(x=>x.x),datasets:[{label:'1RM – '+sel+' (kg)',data:p.map(x=>x.y),borderColor:'#E8A200',backgroundColor:'rgba(255,195,0,.22)',fill:true,tension:.35,pointRadius:5,borderWidth:3,pointBackgroundColor:'#E8A200'}]},options:OPT()});
+
+  const mus={};ss.forEach(s=>s.items.forEach(i=>mus[i.mus]=(mus[i.mus]||0)+vol(i)));
+  mk('cMuscle',{type:'doughnut',data:{labels:Object.keys(mus),datasets:[{data:Object.values(mus),backgroundColor:P,borderColor:'#FFFCF1',borderWidth:3}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:VW()==='s'?'bottom':'right',labels:{color:'#4A4944',boxWidth:14,font:{family:'Anuphan',size:14}}}}}});
+
+  mk('cMeas',{type:'line',data:{labels:bb.map(b=>b.date),datasets:[
+    {label:'อก',data:bb.map(b=>b.chest),borderColor:'#E8A200',tension:.35,borderWidth:2.5},
+    {label:'เอว',data:bb.map(b=>b.waist),borderColor:'#E5484D',tension:.35,borderWidth:2.5},
+    {label:'สะโพก',data:bb.map(b=>b.hip),borderColor:'#F97316',tension:.35,borderWidth:2.5},
+    {label:'แขน',data:bb.map(b=>b.arm),borderColor:'#8A8D96',tension:.35,borderWidth:2.5},
+    {label:'ขา',data:bb.map(b=>b.thigh),borderColor:'#B8860B',tension:.35,borderWidth:2.5}]},options:OPT()});
+}
+
+/* ===== REPORT TAB CHARTS & PRINT PREP ===== */
+let PER=7;
+const dn=d=>Math.floor(Date.parse(d)/864e5),clr=id=>{if(charts[id]){charts[id].destroy();delete charts[id];}};
+const setPer=d=>{PER=d;renderPeriod();};
+function aggP(a,b){const r={n:0,vol:0,sets:0,f:[0,0,0,0],ex:{}};
+  db.sessions.filter(s=>s.cid===db.cur&&dn(s.date)>=a&&dn(s.date)<=b).forEach(s=>{r.n++;s.items.forEach(i=>{const v=vol(i);r.vol+=v;r.sets+=i.sets.length;i.sets.forEach(x=>r.f[x.f||0]++);const e=r.ex[i.ex]=r.ex[i.ex]||{v:0,o:0};e.v+=v;e.o=Math.max(e.o,bestORM(i));});});return r;}
+function bucketVol(a,days,B){const out=Array(Math.ceil(days/B)).fill(0);db.sessions.filter(s=>s.cid===db.cur).forEach(s=>{const d=dn(s.date)-a;if(d>=0&&d<days)out[Math.floor(d/B)]+=s.items.reduce((t,i)=>t+vol(i),0);});return out;}
+const REG=['อก','ไหล่','หน้าแขน','หลังแขน','แกนกลาง','หลัง','ก้น','หน้าขา','หลังขา','น่อง'];
+function regionsOf(ex,mus){const m=mus||(DESC[ex]&&DESC[ex].mus)||'';if(REG.indexOf(m)>=0)return[m];
+  if(m==='ขา')return['หน้าขา','ก้น','หลังขา'];if(m==='แขน')return['หน้าแขน','หลังแขน'];
+  const n=ex.toLowerCase();
+  if(/handstand|pike/.test(n))return['ไหล่','หลังแขน'];
+  if(/pull-up|chin|row|lever|muscle-up|skin|skierg|sled pull|rowing/.test(n))return['หลัง','หน้าแขน'];
+  if(/push-up|dip|planche/.test(n))return['อก','ไหล่','หลังแขน'];
+  if(/squat|lunge|step|jump|run|bike|sled push|wall ball|burpee/.test(n))return['หน้าขา','ก้น','น่อง'];
+  if(/raise|l-sit|hollow|dragon|flag|plank|carry|crawl|toes/.test(n))return['แกนกลาง'];
+  return[];}
+let HM='s';const setHM=m=>{HM=m;renderPeriod();};
+function heatAgg(a,b){const r={sets:{},ex:{}};REG.forEach(x=>r.sets[x]=0);
+  db.sessions.filter(s=>s.cid===db.cur&&dn(s.date)>=a&&dn(s.date)<=b).forEach(s=>s.items.forEach(i=>{const g=regionsOf(i.ex,i.mus);g.forEach(x=>r.sets[x]+=i.sets.length);const o=bestORM(i);if(o>0){const e=r.ex[i.ex]=r.ex[i.ex]||{o:0,g:g};e.o=Math.max(e.o,o);}}));return r;}
+function renderHeat(a,T,pa){
+  const c=heatAgg(a,T),p=heatAgg(pa,a-1),gain={};
+  REG.forEach(x=>{const L=[];Object.keys(c.ex).forEach(k=>{const e=c.ex[k],q=p.ex[k];if(q&&q.o>0&&e.g.indexOf(x)>=0)L.push((e.o-q.o)/q.o*100);});gain[x]=L.length?L.reduce((u,v)=>u+v,0)/L.length:null;});
+  const mx=Math.max(1,...REG.map(x=>c.sets[x]));
+  const col=x=>{if(HM==='s'){const v=c.sets[x];if(!v)return'var(--bg2)';const t=v/mx;return'hsl('+(48-42*t)+',95%,'+(78-28*t)+'%)';}
+    const g=gain[x];if(g===null)return'#DDD5BE';const t=Math.min(1,Math.abs(g)/20);return g>=0?'hsl(130,55%,'+(80-34*t)+'%)':'hsl(5,75%,'+(82-28*t)+'%)';};
+  REG.forEach(x=>document.querySelectorAll('#hmSvg [data-m="'+x+'"]').forEach(e=>e.style.fill=col(x)));
+  hmMode.innerHTML=[['s','การกระตุ้น (จำนวนเซ็ต)'],['g','ความแข็งแรง (Δ 1RM)']].map(m=>'<span class="chip'+(HM===m[0]?' on':'')+'" onclick="setHM(\''+m[0]+'\')">'+m[1]+'</span>').join('');
+  hmLegend.textContent=HM==='s'?'สีเข้ม = ถูกกระตุ้นมาก (เทียบกับกล้ามเนื้อที่ถูกใช้มากที่สุดในช่วงนี้) • เทา = ไม่ถูกกระตุ้น':'เขียว = 1RM เพิ่มขึ้นจากช่วงก่อน • แดง = ลดลง • เทา = ไม่มีข้อมูลเทียบ (ต้องมีท่าเดียวกันทั้งสองช่วง)';
+  hmTable.innerHTML='<table><thead><tr><th>กล้ามเนื้อ</th><th>เซ็ตช่วงนี้</th><th>ช่วงก่อน</th><th>Δ 1RM</th></tr></thead><tbody>'+REG.slice().sort((x,y)=>c.sets[y]-c.sets[x]).map(x=>'<tr><td>'+x+'</td><td>'+c.sets[x]+'</td><td>'+p.sets[x]+'</td><td>'+(gain[x]===null?'—':(gain[x]>=0?'▲ +':'▼ ')+gain[x].toFixed(1)+'%')+'</td></tr>').join('')+'</tbody></table>';}
+function renderPeriod(){
+  const T=dn(today()),days=PER,a=T-days+1,pa=a-days,B={7:1,30:6,90:15,180:30}[days];
+  perChips.innerHTML=[[7,'1 สัปดาห์'],[30,'1 เดือน'],[90,'3 เดือน'],[180,'6 เดือน']].map(x=>'<span class="chip'+(x[0]===days?' on':'')+'" onclick="setPer('+x[0]+')">'+x[1]+'</span>').join('');
+  const sh=n=>{const d=new Date(n*864e5);return d.getUTCDate()+'/'+(d.getUTCMonth()+1);};
+  perRange.textContent=sh(a)+' – '+sh(T);
+  const c=aggP(a,T),p=aggP(pa,a-1),pct=(x,y)=>Math.round((x-y)/y*100);
+  const dl=(x,y)=>y?(x>=y?'▲ ':'▼ ')+Math.abs(pct(x,y))+'% จากช่วงก่อน':(x?'ไม่มีข้อมูลช่วงก่อน':'');
+  const tf=o=>o.f[1]+o.f[2]+o.f[3],fg=o=>tf(o)?Math.round(o.f[1]/tf(o)*100):0,df=fg(c)-fg(p);
+  perKpi.innerHTML=[['เทรนกี่ครั้ง',c.n,dl(c.n,p.n)],['Volume รวม (kg)',fmt(c.vol),dl(c.vol,p.vol)],['จำนวนเซ็ต',c.sets,dl(c.sets,p.sets)],['ฟอร์มดี',fg(c)+'%',tf(p)?(df>=0?'▲ +':'▼ -')+Math.abs(df)+' จุด':'']].map(k=>'<div class="kpi"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="sub">'+k[2]+'</div></div>').join('');
+  const ax={ticks:{color:'#7A786F'},grid:{color:'#E2D8B8'}},lg={labels:{color:'#4A4944',boxWidth:14,font:{family:'Anuphan',size:13}}};
+  if(!c.n&&!p.n){perSum.textContent='ยังไม่มีข้อมูลการฝึกในช่วงนี้และช่วงก่อนหน้า';clr('cPerVol');clr('cPer1rm');perExNote.textContent='';}
+  else{
+    let top='',g=0;Object.keys(c.ex).forEach(k=>{const q=p.ex[k];if(q&&q.o>0&&c.ex[k].o-q.o>g){g=c.ex[k].o-q.o;top=k;}});
+    perSum.textContent='สรุปอัตโนมัติ: เทรน '+c.n+' ครั้ง'+(p.n?' (ช่วงก่อน '+p.n+')':'')+' • Volume '+(p.vol?(c.vol>=p.vol?'เพิ่มขึ้น ':'ลดลง ')+Math.abs(pct(c.vol,p.vol))+'%':fmt(c.vol)+' kg')+(top?' • 1RM เพิ่มมากสุด: '+top+' (+'+g.toFixed(1)+' kg)':'');
+    const lab=[];for(let i=0;i<Math.ceil(days/B);i++)lab.push(sh(a+i*B));
+    mk('cPerVol',{type:'bar',data:{labels:lab,datasets:[{label:'ช่วงก่อน',data:bucketVol(pa,days,B),backgroundColor:'#9A9DA5',borderRadius:4},{label:'ช่วงนี้',data:bucketVol(a,days,B),backgroundColor:'#FFC300',borderRadius:4}]},options:{responsive:true,plugins:{legend:lg},scales:{x:ax,y:ax}}});
+    const ks=Object.keys(c.ex).sort((x,y)=>c.ex[y].v-c.ex[x].v).slice(0,8);
+    if(ks.length){perExNote.textContent='';mk('cPer1rm',{type:'bar',data:{labels:ks,datasets:[{label:'ช่วงก่อน',data:ks.map(k=>p.ex[k]?+p.ex[k].o.toFixed(1):0),backgroundColor:'#9A9DA5',borderRadius:4},{label:'ช่วงนี้',data:ks.map(k=>+c.ex[k].o.toFixed(1)),backgroundColor:'#FFC300',borderRadius:4}]},options:{indexAxis:'y',responsive:true,aspectRatio:VW()==='s'?0.9:1.7,plugins:{legend:lg},scales:{x:ax,y:ax}}});}
+    else{clr('cPer1rm');perExNote.textContent='ยังไม่มีข้อมูลท่าในช่วงนี้';}
+  }
+  const bb=db.body.filter(b=>b.cid===db.cur&&dn(b.date)>=a&&dn(b.date)<=T).sort((x,y)=>x.date.localeCompare(y.date));
+  if(bb.length){perBodyNote.textContent='';mk('cPerBody',{type:'line',data:{labels:bb.map(b=>b.date),datasets:[{label:'น้ำหนัก (kg)',data:bb.map(b=>b.w||null),borderColor:'#E8A200',backgroundColor:'#E8A200',tension:.3,spanGaps:true,yAxisID:'y'},{label:'ไขมัน (%)',data:bb.map(b=>b.bf||null),borderColor:'#7A786F',backgroundColor:'#7A786F',tension:.3,spanGaps:true,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:lg},scales:{x:ax,y:ax,y1:{ticks:ax.ticks,grid:{drawOnChartArea:false},position:'right'}}}});}
+  else{clr('cPerBody');perBodyNote.textContent='ยังไม่มีข้อมูลวัดร่างกายในช่วงนี้';}
+  if(tf(c)){perFormNote.textContent='';mk('cPerForm',{type:'doughnut',data:{labels:['ดี','พอใช้','ต้องแก้ไข'],datasets:[{data:[c.f[1],c.f[2],c.f[3]],backgroundColor:['#7BC96F','#FFD23F','#FF5A4D'],borderColor:'#FFFBEF',borderWidth:3}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:lg.labels}}}});}
+  else{clr('cPerForm');perFormNote.textContent='ยังไม่มีการประเมินฟอร์มในช่วงนี้';}
+  renderHeat(a,T,pa);
+}
+function renderReportCharts(){
+  renderPeriod();
+  const bb=db.body.filter(b=>b.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+  
+  // กราฟแท่งแนวนอน (Horizontal Bar) สัดส่วน
+  const barOpts={indexAxis:'y',responsive:true,aspectRatio:VW()==='s'?0.8:2,plugins:{legend:{labels:{color:'#4A4944',boxWidth:14,font:{family:'Anuphan',size:13}}}},scales:{x:{ticks:{color:'#7A786F'},grid:{color:'#E2D8B8'}},y:{ticks:{color:'#7A786F'},grid:{color:'#E2D8B8'}}}};
+
+  if(bb.length>=1){
+    const f=bb[0], l=bb[bb.length-1];
+    const bData={
+      labels:['น้ำหนัก (kg)', 'ไขมัน (%)', 'มวลกล้ามเนื้อ (kg)', 'รอบอก (ซม.)', 'รอบเอว (ซม.)', 'รอบสะโพก (ซม.)', 'รอบแขน (ซม.)', 'รอบขา (ซม.)'],
+      datasets:[
+        {label:'วันแรก ('+f.date+')', data:[f.w, f.bf, f.mm, f.chest, f.waist, f.hip, f.arm, f.thigh], backgroundColor:'#9A9DA5', borderRadius:4},
+        {label:'ล่าสุด ('+l.date+')', data:[l.w, l.bf, l.mm, l.chest, l.waist, l.hip, l.arm, l.thigh], backgroundColor:'#FFC300', borderRadius:4}
+      ]
+    };
+    mk('cRepBar',{type:'bar',data:bData,options:barOpts});
+  } else {
+    if(charts['cRepBar']) charts['cRepBar'].destroy();
+    document.getElementById('cRepBar').insertAdjacentHTML('afterend', '<div class="empty">ยังไม่มีข้อมูลวัดร่างกายอย่างน้อย 1 รายการ</div>');
+  }
+
+  // กราฟเส้นแนวนอนแยกรายท่า (IndexAxis: 'x' แต่จัดทรงให้เป็นเส้นแนวนอนสมบูรณ์)
+  const ss=db.sessions.filter(s=>s.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+  const exs={};
+  ss.forEach(s=>s.items.forEach(i=>{
+    exs[i.ex]=exs[i.ex]||{pts:[]};
+    exs[i.ex].pts.push({x:s.date, y:+bestORM(i).toFixed(1)});
+  }));
+
+  const keys=Object.keys(exs);
+  const gridEl=document.getElementById('reportExGrid');
+  keys.forEach(k=>{ if(charts['rep_ex_'+k]) charts['rep_ex_'+k].destroy(); });
+
+  if(!keys.length){
+    gridEl.innerHTML='<div class="empty" style="grid-column:1/-1">ยังไม่มีประวัติการฝึกท่าออกกำลังกายในคอร์สนี้</div>';
+    return;
+  }
+
+  gridEl.innerHTML=keys.map(k=>'<div class="card" style="background:var(--bg2)"><h2>'+k+'</h2><canvas id="rep_ex_'+btoa(k).replace(/=/g,'')+'"></canvas></div>').join('');
+
+  keys.forEach(k=>{
+    const canvasId='rep_ex_'+btoa(k).replace(/=/g,'');
+    const p=exs[k].pts;
+    mk(canvasId,{
+      type:'line',
+      data:{
+        labels:p.map(x=>x.x),
+        datasets:[{
+          label:'1RM ประมาณการ (kg)',
+          data:p.map(x=>x.y),
+          borderColor:'#E8A200',
+          backgroundColor:'rgba(255,195,0,.15)',
+          fill:true,
+          tension:.35,
+          pointRadius:4,
+          borderWidth:2.5,
+          pointBackgroundColor:'#E8A200'
+        }]
+      },
+      options:OPT()
+    });
+  });
+}
+
+/* ===== TRIGGER PRINT WITH DEDICATED LAYOUT ===== */
+function triggerPrint(){
+  const c=C();
+  if(!c)return alert('กรุณาเลือกลูกค้าก่อนพิมพ์รายงาน');
+  prtName.textContent=c.name;
+  prtGoal.textContent=c.goal;
+  prtPrintDate.textContent=today();
+
+  const ss=db.sessions.filter(s=>s.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+  const bb=db.body.filter(b=>b.cid===db.cur).sort((a,b)=>a.date.localeCompare(b.date));
+
+  prtStart.textContent=bb.length?bb[0].date:c.start;
+  prtEnd.textContent=bb.length?bb[bb.length-1].date:today();
+  prtSess.textContent=ss.length+' / '+c.total+' ครั้ง';
+
+  // สร้างกราฟแท่งแนวนอนสำหรับหน้ารายงานพิมพ์
+  if(charts['printBarCanvas']) charts['printBarCanvas'].destroy();
+  if(bb.length){
+    const f=bb[0], l=bb[bb.length-1];
+    charts['printBarCanvas']=new Chart(document.getElementById('printBarCanvas'),{
+      type:'bar',
+      data:{
+        labels:['น้ำหนัก (kg)', 'ไขมัน (%)', 'มวลกล้ามเนื้อ (kg)', 'รอบอก', 'รอบเอว', 'รอบสะโพก', 'รอบแขน', 'รอบขา'],
+        datasets:[
+          {label:'วันแรก ('+f.date+')', data:[f.w, f.bf, f.mm, f.chest, f.waist, f.hip, f.arm, f.thigh], backgroundColor:'#888'},
+          {label:'ล่าสุด ('+l.date+')', data:[l.w, l.bf, l.mm, l.chest, l.waist, l.hip, l.arm, l.thigh], backgroundColor:'#D49A00'}
+        ]
+      },
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}}}
+    });
+  }
+
+  // สร้างหน้าพล็อตเส้นรายท่าสำหรับหน้ารายงานพิมพ์
+  const exs={};
+  ss.forEach(s=>s.items.forEach(i=>{
+    exs[i.ex]=exs[i.ex]||{pts:[]};
+    exs[i.ex].pts.push({x:s.date, y:+bestORM(i).toFixed(1)});
+  }));
+  const keys=Object.keys(exs);
+  const container=document.getElementById('printExPagesContainer');
+  container.innerHTML='';
+
+  if(keys.length){
+    // จัดกลุ่มใส่การ์ดพิมพ์ (2 ท่าต่อหน้ากระดาษพิมพ์)
+    let chunkHtml='';
+    keys.forEach((k,idx)=>{
+      const cid='prt_ex_canvas_'+idx;
+      chunkHtml+='<div class="print-card"><h3>พัฒนาการท่า: '+k+'</h3><div style="width:100%;height:180px"><canvas id="'+cid+'"></canvas></div></div>';
+      if((idx+1)%2===0 || idx===keys.length-1){
+        container.innerHTML+='<div class="print-page">'+chunkHtml+'</div>';
+        chunkHtml='';
+      }
+    });
+
+    // วาดกราฟเส้นลงในพิมพ์
+    setTimeout(()=>{
+      keys.forEach((k,idx)=>{
+        const cid='prt_ex_canvas_'+idx;
+        const el=document.getElementById(cid);
+        if(el){
+          const p=exs[k].pts;
+          new Chart(el,{
+            type:'line',
+            data:{
+              labels:p.map(x=>x.x),
+              datasets:[{label:'1RM (kg)',data:p.map(x=>x.y),borderColor:'#D49A00',backgroundColor:'rgba(212,154,0,0.1)',fill:true,tension:0.3}]
+            },
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+          });
+        }
+      });
+      window.print();
+    },300);
+  } else {
+    window.print();
+  }
+}
+
+/* ===== REST TIMER + ALARM ===== */
+const PRESETS=[[30,'0:30'],[60,'1:00'],[90,'1:30'],[120,'2:00'],[150,'2:30']];
+const PLBL=['30 วินาที','1 นาที','1.30 นาที','2 นาที','2.30 นาที'];
+let T={total:30,left:30,run:false,id:null,endAt:0,warned:0};
+let AC=null,MASTER=null,alarmNodes=[],alarmLoop=null,repeats=0,origTitle=document.title;
+
+function ac(){
+  if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=AC.createDynamicsCompressor();
+    comp.threshold.value=-8;comp.knee.value=6;comp.ratio.value=12;comp.attack.value=0.002;comp.release.value=0.1;
+    MASTER=AC.createGain();MASTER.gain.value=1;
+    MASTER.connect(comp);comp.connect(AC.destination);}
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+function beep(at,freqs,dur,v){
+  const c=ac();
+  freqs.forEach(f=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='square';o.frequency.setValueAtTime(f,at);
+    g.gain.setValueAtTime(0.0001,at);
+    g.gain.exponentialRampToValueAtTime(Math.max(v,0.0002),at+0.008);
+    g.gain.setValueAtTime(Math.max(v,0.0002),at+dur-0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001,at+dur);
+    o.connect(g);g.connect(MASTER);o.start(at);o.stop(at+dur+0.03);
+    alarmNodes.push(o);
+  });
+}
+const volNow=()=>(parseInt(volR.value)||0)/100;
+
+function fireAlarm(){
+  repeats=0;
+  document.body.classList.add('flash');
+  btnStop.style.display='';btnGo.classList.add('alarmbtn');
+  if(navigator.vibrate)navigator.vibrate([400,150,400,150,400,150,600]);
+  let blink=0;alarmLoop=setInterval(()=>{document.title=(blink++%2)?'⏰ หมดเวลาพัก!':'▶ เริ่มเซ็ตต่อไป';},600);
+  ringAlarm();
+}
+function ringAlarm(){
+  const v=volNow(); if(v<=0)return;
+  const c=ac(),t0=c.currentTime+0.02;
+  for(let i=0;i<10;i++){
+    const t=t0+i*0.38;
+    beep(t,[880,1318,1760],0.26,0.34*v);
+    beep(t+0.19,[1318,1975],0.14,0.28*v);
+  }
+  setTimeout(()=>{ if(document.body.classList.contains('flash')&&repeats++<2) ringAlarm(); },4000);
+}
+function stopAlarm(){
+  repeats=0;
+  alarmNodes.forEach(o=>{try{o.stop(0)}catch(e){}});alarmNodes=[];
+  clearInterval(alarmLoop);alarmLoop=null;document.title=origTitle;
+  document.body.classList.remove('flash');
+  btnStop.style.display='none';btnGo.classList.remove('alarmbtn');
+  ring.classList.remove('done','warn');
+  if(navigator.vibrate)navigator.vibrate(0);
+  resetT();
+}
+function buildPresets(){
+  presets.innerHTML=PRESETS.map((p,i)=>'<div class="ps'+(T.total===p[0]?' on':'')+'" onclick="setT('+p[0]+')">'+p[1]+'<small>'+PLBL[i]+'</small></div>').join('');
+}
+function setT(sec){
+  if(document.body.classList.contains('flash')){
+    repeats=0;alarmNodes.forEach(o=>{try{o.stop(0)}catch(e){}});alarmNodes=[];
+    clearInterval(alarmLoop);alarmLoop=null;document.title=origTitle;
+    document.body.classList.remove('flash');btnStop.style.display='none';btnGo.classList.remove('alarmbtn');
+    ring.classList.remove('done','warn');
+  }
+  ac();
+  T.total=sec;T.left=sec;T.warned=0;
+  clearInterval(T.id);
+  buildPresets();paintT();startT();
+}
+function toggleT(){ if(document.body.classList.contains('flash')){stopAlarm();return;} T.run?pauseT():startT(); }
+function startT(){
+  ac();
+  if(T.left<=0)T.left=T.total;
+  T.run=true;T.endAt=Date.now()+T.left*1000;
+  btnGo.textContent='⏸ หยุดชั่วคราว';tState.textContent='กำลังนับถอยหลัง';
+  clearInterval(T.id);T.id=setInterval(tickT,100);paintT();
+}
+function pauseT(){T.run=false;clearInterval(T.id);btnGo.textContent='▶ เริ่มต่อ';tState.textContent='หยุดชั่วคราว';ring.classList.remove('warn');}
+function resetT(){T.run=false;clearInterval(T.id);T.left=T.total;T.warned=0;btnGo.textContent='▶ เริ่ม';tState.textContent='พร้อมเริ่ม';ring.classList.remove('warn','done');paintT();}
+function bumpT(s){T.total+=s;T.left+=s;if(T.run)T.endAt+=s*1000;buildPresets();paintT();}
+function tickT(){
+  T.left=Math.max(0,(T.endAt-Date.now())/1000);
+  const sec=Math.ceil(T.left);
+  if(preWarn.checked&&sec<=3&&sec>0&&T.warned!==sec){T.warned=sec;beep(ac().currentTime+0.01,[1046],0.11,0.18*volNow());}
+  if(T.left<=0){clearInterval(T.id);T.run=false;T.left=0;
+    ring.classList.remove('warn');ring.classList.add('done');
+    tState.textContent='หมดเวลา!';btnGo.textContent='🔇 หยุดเสียง';
+    paintT();fireAlarm();return;}
+  ring.classList.toggle('warn',T.left<=5);
+  paintT();
+}
+function paintT(){
+  const s=Math.ceil(T.left);
+  tDisp.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  ring.style.setProperty('--p',(T.total?(T.left/T.total*100):0).toFixed(1)+'%');
+}
+document.addEventListener('keydown',e=>{
+  if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.code==='Space'){e.preventDefault();toggleT();}
+  if(e.code==='Escape')stopAlarm();
+});
+
+/* ===== IO ===== */
+async function exportJSON(){const d=typeof claude!=='undefined'&&claude.use?await claude.use('downloads').catch(()=>null):null;if(d){try{await d.save({filename:'trainer-data-'+today()+'.json',data:JSON.stringify(db,null,2)});}catch(e){}return;}const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='trainer-data-'+today()+'.json';a.click();}
+function importJSON(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{db=JSON.parse(e.target.result);save();render();alert('นำเข้าสำเร็จ');}catch(x){alert('ไฟล์ไม่ถูกต้อง');}};r.readAsText(f);}
+
+/* ===== INIT ===== */
+tDate.value=today();bDate.value=today();cStart.value=today();
+tDate.addEventListener('change',render);
+buildLib();buildChips();addSet();addSet();addSet();
+buildPresets();paintT();
+if(!db.clients.length){db.clients.push({id:uid(),name:'ลูกค้าตัวอย่าง',age:30,sex:'ชาย',h:172,goal:'เพิ่มกล้ามเนื้อ',total:12,start:today(),phone:'',med:''});db.cur=db.clients[0].id;save();}
+if(!db.cur)db.cur=db.clients[0].id;
+render();
+/* ===== CLOUD SYNC (same data on every device) ===== */
+var CLcol=null,CLlast={},CLtimer=null,CLown=0;
+const setDot=c=>{const e=document.getElementById('syncDot');if(e){e.className='sd '+c;e.title={ok:'ซิงก์แล้ว',sync:'กำลังซิงก์…',err:'ซิงก์ไม่สำเร็จ (ข้อมูลยังเก็บในเครื่อง)',off:'ใช้ในเครื่องเดียว'}[c]||'';}};
+function splitDb(){const o={core:{clients:db.clients,body:db.body||[],tpl:db.tpl,tplV2:db.tplV2||0,cur:db.cur}};(db.sessions||[]).forEach(x=>{const k='sess_'+x.cid+'_'+(x.date||'').slice(0,7).replace('-','');(o[k]=o[k]||{list:[]}).list.push(x);});return o;}
+function assembleDb(docs){const o={clients:[],sessions:[],body:[],cur:null};docs.forEach(d=>{const x=JSON.parse(d.data().j);CLlast[d.id]=d.data().j;if(d.id==='core')Object.assign(o,x);else o.sessions=o.sessions.concat(x.list||[]);});return o;}
+function mergeDb(a,b){const r=JSON.parse(JSON.stringify(a));
+  b.clients.forEach(c=>{if(!r.clients.some(x=>x.id===c.id))r.clients.push(c);});
+  b.sessions.forEach(x=>{const t=r.sessions.find(y=>y.cid===x.cid&&y.date===x.date);if(!t)r.sessions.push(x);else x.items.forEach(i=>{if(!t.items.some(y=>y.id===i.id))t.items.push(i);});});
+  (b.body||[]).forEach(e=>{r.body=r.body||[];if(!r.body.some(x=>x.id?x.id===e.id:(x.cid===e.cid&&x.date===e.date)))r.body.push(e);});
+  if(!r.tpl&&b.tpl){r.tpl=b.tpl;r.tplV2=b.tplV2;}return r;}
+function cloudSave(){if(!CLcol)return;clearTimeout(CLtimer);setDot('sync');CLtimer=setTimeout(pushAll,700);}
+async function pushAll(){try{const parts=splitDb();CLown=Date.now();
+  for(const k of Object.keys(parts)){const str=JSON.stringify(parts[k]);if(CLlast[k]!==str){await CLcol.doc(k).set({j:str});CLlast[k]=str;}}
+  for(const k of Object.keys(CLlast)){if(!parts[k]){await CLcol.doc(k).delete();delete CLlast[k];}}
+  CLown=Date.now();setDot('ok');}catch(e){setDot('err');}}
+function adoptDb(n){if(JSON.stringify(n)===JSON.stringify(db))return;db=n;if(!db.cur||!C())db.cur=db.clients[0]?db.clients[0].id:null;try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}render();}
+/* ===== NETLIFY API (central DB via /api/db) ===== */
+const apiH=()=>{let k='';try{k=localStorage.getItem('bt_key')||'';}catch(e){}return k?{'x-app-key':k}:{};};
+async function apiCall(path,opt){opt=opt||{};opt.headers=Object.assign({},apiH(),opt.headers||{});
+  let r=await fetch('/api/db'+path,opt);
+  if(r.status===401){const k=prompt('กรอกรหัสเข้าใช้งาน (APP_KEY ที่ตั้งไว้บน Netlify)');if(!k)throw new Error('401');try{localStorage.setItem('bt_key',k);}catch(e){}opt.headers=Object.assign({},opt.headers,{'x-app-key':k});r=await fetch('/api/db'+path,opt);}
+  if(!r.ok)throw new Error(r.status);return r;}
+const NET={
+  get:async()=>{const o=await (await apiCall('')).json();const docs=Object.keys(o).map(k=>({id:k,data:()=>({j:o[k]})}));return{empty:!docs.length,docs};},
+  doc:k=>({set:async v=>{await apiCall('/'+encodeURIComponent(k),{method:'PUT',body:v.j});},delete:async()=>{await apiCall('/'+encodeURIComponent(k),{method:'DELETE'});}})
+};
+(async()=>{try{
+  CLcol=NET;setDot('sync');
+  const snap=await CLcol.get();let first=false;try{first=!localStorage.getItem('trainerDash_net');}catch(e){}
+  if(snap.empty){await pushAll();}
+  else{const r=assembleDb(snap.docs);if(first&&db.clients.length){adoptDb(mergeDb(r,db));await pushAll();}else{adoptDb(r);setDot('ok');}}
+  try{localStorage.setItem('trainerDash_net','1');}catch(e){}
+  setDot('ok');
+  setInterval(async()=>{if(document.hidden||CLtimer||Date.now()-CLown<4000)return;
+    try{const sn=await CLcol.get();const ids=sn.docs.map(d=>d.id);
+      const changed=sn.docs.some(d=>CLlast[d.id]!==d.data().j)||Object.keys(CLlast).some(k=>ids.indexOf(k)<0);
+      if(changed&&!sn.empty)adoptDb(assembleDb(sn.docs));setDot('ok');}catch(e){setDot('err');}},15000);
+}catch(e){setDot('err');}})();
+/* re-draw charts when screen class changes (rotate phone/iPad, resize) */
+let _vw=VW(),_rt;
+addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(()=>{const n=VW();if(n!==_vw){_vw=n;render();if(!document.getElementById('p-report').classList.contains('hide'))renderReportCharts();}},250);});
+</script>
+</body>
+</html>
