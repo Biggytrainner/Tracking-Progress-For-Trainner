@@ -263,6 +263,7 @@ body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .ca
 #rpModal{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.7);overflow:auto;padding:16px;display:grid;place-items:start center}
 #rpModal.hide{display:none}.rpbox{background:var(--card);border-radius:20px;padding:14px;max-width:520px;width:100%}.rpbox img{width:100%;border-radius:12px;display:block}
 @media print{#rpModal{display:none!important}}
+@media (max-width:600px){#bnav i{padding:5px 10px}#bnav button{font-size:10.5px}}
 </style>
 </head>
 <body>
@@ -285,6 +286,7 @@ body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .ca
   <div class="tab" data-t="train" onclick="tab('train')">บันทึกเทรน</div>
   <div class="tab" data-t="body" onclick="tab('body')">วัดร่างกาย</div>
   <div class="tab" data-t="hist" onclick="tab('hist')">ประวัติ</div>
+  <div class="tab" data-t="nutri" onclick="tab('nutri')">🥗 โภชนาการ</div>
   <div class="tab" data-t="client" onclick="tab('client')">ลูกค้า</div>
 </div>
 
@@ -435,6 +437,23 @@ body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .ca
 
 <section id="p-hist" class="hide"><div class="card"><h2>ประวัติการเทรนทั้งหมด</h2><div id="histBody"></div></div></section>
 
+<section id="p-nutri" class="hide">
+  <div class="card" style="margin-bottom:18px"><h2>ข้อมูลร่างกาย &amp; พลังงาน</h2>
+    <div class="row r4"><div><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="nW" oninput="nutChange()"></div><div><label>ส่วนสูง (ซม.)</label><input type="number" id="nH" oninput="nutChange()"></div><div><label>อายุ</label><input type="number" id="nA" oninput="nutChange()"></div><div><label>เพศ</label><select id="nS" onchange="nutChange()"><option>ชาย</option><option>หญิง</option></select></div></div>
+    <div class="row r2" style="margin-top:12px"><div><label>ไขมันในร่างกาย % (ถ้ามี)</label><input type="number" step="0.1" id="nBF" oninput="nutChange()"></div><div><label>ระดับกิจกรรม</label><select id="nAct" onchange="nutChange()"></select></div></div>
+    <div class="grid g4" id="nOut" style="margin-top:14px"></div></div>
+  <div class="chips" id="nvChips"></div>
+  <div id="nvFood">
+    <div class="card" style="margin-bottom:18px"><h2>เป้าหมายแคลอรี่ (แตะเพื่อเลือก)</h2><div class="grid g4" id="nGoalChips"></div></div>
+    <div class="card" style="margin-bottom:18px"><h2>โปรตีน คาร์บ ไขมัน</h2><div class="chips" id="nCarbChips"></div><div id="nMacro"></div></div>
+    <div class="card"><h2>ตัวอย่างเมนูทั้งวัน</h2><div id="nMenu"></div><div class="sub" style="margin-top:12px">เป็นการประมาณการเพื่อวางแผน ไม่ใช่คำแนะนำทางการแพทย์ ผู้มีโรคประจำตัว ตั้งครรภ์ หรือเคยมีปัญหาการกิน ควรปรึกษาแพทย์หรือนักกำหนดอาหารก่อนลดแคลอรี่</div></div>
+  </div>
+  <div id="nvGoal" class="hide"><div class="card"><h2>ตั้งเป้าหมาย</h2>
+    <div class="row r4"><div><label>ลดไขมัน (kg)</label><input type="number" step="0.5" id="gFat" oninput="nutChange()"></div><div><label>เพิ่มกล้ามเนื้อ (kg)</label><input type="number" step="0.5" id="gMus" oninput="nutChange()"></div><div><label>ระยะเวลาที่ตั้งใจ (เดือน)</label><input type="number" step="0.5" id="gMon" oninput="nutChange()"></div><div><label>ประสบการณ์เทรน</label><select id="gExp" onchange="nutChange()"><option value="beginner">เริ่มต้น (&lt; 1 ปี)</option><option value="mid">ปานกลาง (1-3 ปี)</option><option value="adv">ขั้นสูง (&gt; 3 ปี)</option></select></div></div>
+    <div id="gOut" style="margin-top:14px"></div><canvas id="cGoal" style="margin-top:14px"></canvas>
+    <div class="sub" style="margin-top:12px">คำนวณจากกฎประมาณ 7,700 kcal ต่อไขมัน 1 กก. และอัตราเพิ่มกล้ามเนื้อตามประสบการณ์ (ผู้หญิงใช้ครึ่งหนึ่ง) ผลจริงต่างกันในแต่ละคน ควรปรับแผนทุก 2–4 สัปดาห์ตามการวัดร่างกาย</div></div></div>
+</section>
+
 <section id="p-client" class="hide">
   <div class="grid g2">
     <div class="card">
@@ -451,7 +470,7 @@ body.ro #p-train .card button,body.ro #p-body .card button,body.ro #p-client .ca
 </div>
 
 <div id="rpModal" class="hide"><div class="rpbox"><img id="rpImg" alt="รายงานการฝึก"><div class="chips" style="justify-content:center;margin:12px 0 0"><button onclick="shareReport()">แชร์ให้ลูกเทรน</button><button class="ghost" onclick="saveReport()">บันทึกรูป</button><button class="ghost" onclick="closeReport()">ปิด</button></div></div></div>
-<nav id="bnav"><button data-t="dash" class="on" onclick="tab('dash')"><i><svg viewBox="0 0 24 24"><path d="M5 20v-6M12 20V5M19 20v-9"/></svg></i><span>ภาพรวม</span></button><button data-t="report" onclick="tab('report')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></i><span>รายงาน</span></button><button data-t="train" onclick="tab('train')"><i><svg viewBox="0 0 24 24"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg></i><span>เทรน</span></button><button data-t="body" onclick="tab('body')"><i><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></svg></i><span>วัดตัว</span></button><button data-t="hist" onclick="tab('hist')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></i><span>ประวัติ</span></button><button data-t="client" onclick="tab('client')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></i><span>ลูกค้า</span></button></nav>
+<nav id="bnav"><button data-t="dash" class="on" onclick="tab('dash')"><i><svg viewBox="0 0 24 24"><path d="M5 20v-6M12 20V5M19 20v-9"/></svg></i><span>ภาพรวม</span></button><button data-t="report" onclick="tab('report')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></i><span>รายงาน</span></button><button data-t="train" onclick="tab('train')"><i><svg viewBox="0 0 24 24"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg></i><span>เทรน</span></button><button data-t="body" onclick="tab('body')"><i><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></svg></i><span>วัดตัว</span></button><button data-t="hist" onclick="tab('hist')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></i><span>ประวัติ</span></button><button data-t="nutri" onclick="tab('nutri')"><i><svg viewBox="0 0 24 24"><path d="M12 8c-2.5-2-7-1-7 4 0 4 3 8 7 8s7-4 7-8c0-5-4.500-6-7-4zM12 8c0-2 1-3.500 3-4"/></svg></i><span>โภชนาการ</span></button><button data-t="client" onclick="tab('client')"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></i><span>ลูกค้า</span></button></nav>
 
 <!-- ================= PRINT REPORT DOM CONTAINER ================= -->
 <div id="printReportArea">
@@ -954,6 +973,83 @@ async function shareReport(){if(!RP_BLOB)return;const c=C()||{},s=curSess(),f=ne
   try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'รายงานการฝึก '+(c.name||'')});return;}}catch(e){if(e&&e.name==='AbortError')return;}
   saveReport();}
 function closeReport(){rpModal.classList.add('hide');}
+/* ===== NUTRITION & GOALS ===== */
+let NV='food',NG='maintain',NC='mod';
+const NACT=[[1.2,'นั่งทำงาน ออกกำลังกายน้อยมาก'],[1.375,'เบา (1-3 วัน/สัปดาห์)'],[1.55,'ปานกลาง (3-5 วัน/สัปดาห์)'],[1.725,'หนัก (6-7 วัน/สัปดาห์)'],[1.9,'หนักมาก (ใช้แรงงาน/ซ้อมวันละ 2 รอบ)']];
+const NGOALS={maintain:{n:'Maintenance',f:1,p:1.8,d:'คงน้ำหนัก'},bulk:{n:'Bulking',f:1.1,p:1.8,d:'+10% เพิ่มกล้ามเนื้อ'},cut:{n:'Cutting',f:0.8,p:2.2,d:'−20% ลดไขมัน'}};
+const NCARB={high:{n:'High carb',f:.20},mod:{n:'Moderate carb',f:.28},low:{n:'Low carb',f:.45}};
+const NFOOD={rice:{n:'ข้าวสวย',k:130,p:2.7,c:28,f:.3},oat:{n:'ข้าวโอ๊ต (ดิบ)',k:389,p:17,c:66,f:7},sp:{n:'มันเทศ',k:86,p:1.6,c:20,f:.1},banana:{n:'กล้วย',k:89,p:1.1,c:23,f:.3},chick:{n:'อกไก่ (สุก)',k:165,p:31,c:0,f:3.6},egg:{n:'ไข่ไก่',k:143,p:12.6,c:.7,f:9.5},fish:{n:'ปลานิล/ปลากะพง (สุก)',k:128,p:26,c:0,f:2.7},yog:{n:'กรีกโยเกิร์ตไม่หวาน',k:59,p:10,c:3.6,f:.4},veg:{n:'ผักลวก',k:30,p:2.5,c:5,f:.3},oil:{n:'น้ำมันมะกอก',k:884,p:0,c:0,f:100},pb:{n:'เนยถั่ว',k:588,p:25,c:20,f:50},avo:{n:'อะโวคาโด',k:160,p:2,c:9,f:15}};
+const NMEALS=[['มื้อเช้า',.25,'oat','egg','pb',0],['มื้อกลางวัน',.30,'rice','chick','oil',1],['มื้อว่าง/ก่อนเทรน',.15,'banana','yog','pb',0],['มื้อเย็น',.30,'sp','fish','avo',1]];
+function nMealPlan(P,C,F){return NMEALS.map(m=>{const Pm=P*m[1],Cm=C*m[1],Fm=F*m[1],it=[],t={k:0,p:0,c:0,f:0},A=NFOOD[m[2]],B=NFOOD[m[3]],D=NFOOD[m[4]],V=NFOOD.veg,gv=m[5]?150:0;
+  let ga=0,gb=0,gd=0;
+  for(let n=0;n<10;n++){
+    ga=Math.max(0,(Cm-V.c*gv/100-B.c*gb/100-D.c*gd/100)/A.c*100);
+    gb=Math.max(0,(Pm-V.p*gv/100-A.p*ga/100-D.p*gd/100)/B.p*100);
+    gd=Math.max(0,(Fm-V.f*gv/100-A.f*ga/100-B.f*gb/100)/D.f*100);}
+  const add=(id,g)=>{const d=NFOOD[id];g=id==='egg'?Math.round(g/50)*50:Math.round(g/5)*5;if(g<=0)return;it.push({n:d.n,g,e:id==='egg'?g/50:0});t.k+=d.k*g/100;t.p+=d.p*g/100;t.c+=d.c*g/100;t.f+=d.f*g/100;};
+  if(gv)add('veg',gv);add(m[3],gb);add(m[2],ga);add(m[4],gd);
+  return{n:m[0],it,t};});}
+const nIn=()=>({w:+nW.value||0,h:+nH.value||0,a:+nA.value||0,male:nS.value==='ชาย',bf:+nBF.value||0,act:+nAct.value||1.55});
+function nCalc(){const i=nIn(),mif=10*i.w+6.25*i.h-5*i.a+(i.male?5:-161),kat=i.bf>0?370+21.6*i.w*(1-i.bf/100):0;i.bmr=kat||mif;i.kat=kat;i.tdee=i.bmr*i.act;i.bmi=i.h?i.w/Math.pow(i.h/100,2):0;i.lbm=i.bf>0?i.w*(1-i.bf/100):0;return i;}
+const nMacros=(i,k,g,m)=>{const P=NGOALS[g].p*i.w,F=Math.max(NCARB[m].f*k/9,.6*i.w);return{P,F,C:Math.max(0,(k-4*P-9*F)/4)};};
+function loadNutri(){const c=C();if(!c)return;const n=c.nut||{},bs=db.body.filter(b=>b.cid===db.cur).sort((x,y)=>x.date.localeCompare(y.date)),lw=bs.filter(b=>b.w).pop(),lb=bs.filter(b=>b.bf).pop();
+  nAct.innerHTML=NACT.map(a=>'<option value="'+a[0]+'">'+a[1]+'</option>').join('');
+  nW.value=lw?lw.w:(n.w||'');nH.value=n.h||c.h||'';nA.value=n.a||c.age||'';nS.value=n.s||c.sex||'ชาย';nBF.value=lb?lb.bf:(n.bf||'');nAct.value=n.act||1.55;
+  gFat.value=n.gFat||'';gMus.value=n.gMus||'';gMon.value=n.gMon||'';gExp.value=n.gExp||'beginner';NG=n.NG||'maintain';NC=n.NC||'mod';renderNutri();}
+function nutChange(){const c=C();if(c){c.nut={w:+nW.value||0,h:+nH.value||0,a:+nA.value||0,s:nS.value,bf:+nBF.value||0,act:+nAct.value,gFat:+gFat.value||0,gMus:+gMus.value||0,gMon:+gMon.value||0,gExp:gExp.value,NG,NC};save();}renderNutri();}
+const setNV=v=>{NV=v;renderNutri();},setNG=g=>{NG=g;nutChange();},setNC=m=>{NC=m;nutChange();};
+function renderNutri(){
+  nvChips.innerHTML=[['food','🥗 วางแผนอาหาร'],['goal','🎯 ตั้งเป้าหมาย']].map(x=>'<span class="chip'+(NV===x[0]?' on':'')+'" onclick="setNV(\''+x[0]+'\')">'+x[1]+'</span>').join('');
+  nvFood.classList.toggle('hide',NV!=='food');nvGoal.classList.toggle('hide',NV!=='goal');
+  const i=nCalc();
+  if(!i.w||!i.h||!i.a){nOut.innerHTML='<div class="empty" style="grid-column:1/-1">กรอกน้ำหนัก ส่วนสูง และอายุเพื่อคำนวณ</div>';nMacro.innerHTML=nMenu.innerHTML=nGoalChips.innerHTML=gOut.innerHTML='';clr('cGoal');return;}
+  const bc=i.bmi<18.5?'น้ำหนักต่ำกว่าเกณฑ์':i.bmi<23?'ปกติ':i.bmi<25?'น้ำหนักเกิน':'อ้วน';
+  nOut.innerHTML=[['BMR (kcal)',Math.round(i.bmr),i.kat?'สูตร Katch-McArdle':'สูตร Mifflin-St Jeor'],['TDEE (kcal)',Math.round(i.tdee),'BMR × '+i.act],['BMI',i.bmi.toFixed(1),bc+' (เกณฑ์เอเชีย)'],['มวลปลอดไขมัน',i.lbm?i.lbm.toFixed(1)+' kg':'—',i.lbm?'ไขมัน '+(i.w-i.lbm).toFixed(1)+' kg':'ใส่ % ไขมันเพื่อคำนวณ']].map(k=>'<div class="kpi"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="sub">'+k[2]+'</div></div>').join('');
+  if(NV==='food')renderFood(i);else renderGoal(i);}
+function renderFood(i){
+  const fl=i.male?1500:1200,gk=g=>{let k=i.tdee*NGOALS[g].f;if(g==='cut')k=Math.max(k,fl);return k;};
+  nGoalChips.innerHTML=Object.keys(NGOALS).map(g=>'<div class="kpi" style="cursor:pointer;'+(NG===g?'outline:3px solid var(--y)':'')+'" onclick="setNG(\''+g+'\')"><div class="l">'+NGOALS[g].n+'</div><div class="v">'+Math.round(gk(g))+'</div><div class="sub">kcal/วัน • '+NGOALS[g].d+'</div></div>').join('');
+  nCarbChips.innerHTML=Object.keys(NCARB).map(m=>'<span class="chip'+(NC===m?' on':'')+'" onclick="setNC(\''+m+'\')">'+NCARB[m].n+'</span>').join('');
+  const kc=gk(NG);
+  nMacro.innerHTML='<table><thead><tr><th>โหมด</th><th>โปรตีน</th><th>คาร์บ</th><th>ไขมัน</th><th>P/C/F %</th></tr></thead><tbody>'+Object.keys(NCARB).map(m=>{const x=nMacros(i,kc,NG,m),t=4*x.P+4*x.C+9*x.F;return'<tr'+(NC===m?' style="background:var(--y-soft)"':'')+'><td><b>'+NCARB[m].n+'</b></td><td>'+Math.round(x.P)+' g</td><td>'+Math.round(x.C)+' g</td><td>'+Math.round(x.F)+' g</td><td>'+Math.round(4*x.P/t*100)+'/'+Math.round(4*x.C/t*100)+'/'+Math.round(9*x.F/t*100)+'</td></tr>';}).join('')+'</tbody></table><div class="sub" style="margin-top:8px">โปรตีน '+NGOALS[NG].p+' g/กก. • ไขมันไม่ต่ำกว่า 0.6 g/กก. • ใยอาหาร ≈ '+Math.round(kc/1000*14)+' g • น้ำ ≈ '+(i.w*35/1000).toFixed(1)+' ลิตร/วัน'+(NG==='cut'&&i.tdee*NGOALS.cut.f<fl?' • ⚠ ปรับขึ้นเป็นขั้นต่ำที่ปลอดภัย ('+fl+' kcal) แล้ว':'')+'</div>';
+  const x=nMacros(i,kc,NG,NC),mp=nMealPlan(x.P,x.C,x.F),T={k:0,p:0,c:0,f:0};
+  const rows=mp.map(m=>{Object.keys(T).forEach(k=>T[k]+=m.t[k]);return'<div class="tqi" style="display:block;cursor:default"><b>'+m.n+'</b><div style="margin:6px 0">'+m.it.map(z=>z.e?'ไข่ไก่ '+z.e+' ฟอง':z.n+' '+z.g+' g').join(' • ')+'</div><div class="sub">'+Math.round(m.t.k)+' kcal • P '+Math.round(m.t.p)+' • C '+Math.round(m.t.c)+' • F '+Math.round(m.t.f)+'</div></div>';}).join('');
+  nMenu.innerHTML='<div class="sub" style="margin-bottom:10px">'+NGOALS[NG].n+' • '+NCARB[NC].n+' — ปริมาณเป็นกรัมของอาหารสุก (ยกเว้นข้าวโอ๊ตดิบ) เป็นค่าประมาณ สลับเป็นอาหารที่ชอบหรือที่หาได้ได้ โดยคงโปรตีน/คาร์บ/ไขมันให้ใกล้เคียง</div>'+rows+'<div class="sub"><b>รวมเมนูตัวอย่าง '+Math.round(T.k)+' kcal • P '+Math.round(T.p)+' • C '+Math.round(T.c)+' • F '+Math.round(T.f)+'</b> (เป้า '+Math.round(kc)+' kcal)</div>';}
+function renderGoal(i){
+  const F=+gFat.value||0,M=+gMus.value||0,mo=+gMon.value||0,ex=gExp.value,w=i.w,fm=i.bf>0?w*i.bf/100:0,minBF=i.male?5:12,fl=i.male?1500:1200;
+  const BG={g:'rgba(123,201,111,.35)',y:'rgba(255,210,63,.4)',r:'rgba(255,90,77,.28)'},bd=(t,k)=>'<span class="pill" style="background:'+BG[k]+'">'+t+'</span>';
+  const blk=(h,b,ls)=>'<div class="tqi" style="display:block;cursor:default"><b>'+h+'</b> '+(b||'')+'<div class="sub" style="margin-top:6px;line-height:1.7">'+ls.join('<br>')+'</div></div>';
+  if(!F&&!M){gOut.innerHTML='<div class="empty">กรอกจำนวนไขมันที่อยากลด และ/หรือกล้ามเนื้อที่อยากเพิ่ม (ระยะเวลาที่ตั้งใจเป็นตัวเลือก)</div>';clr('cGoal');return;}
+  const RT=({beginner:[.010,.0125,.015],mid:[.005,.0075,.010],adv:[.0025,.00375,.005]}[ex]).map(r=>r*w*(i.male?1:.5));
+  const wkF=.0075*w,tf=F?F/wkF/4.345:0,tm=M?M/RT[1]:0,out=[];
+  if(F){const mx=fm?fm-w*minBF/100:null,ls=[];let v;
+    ls.push('ระยะเวลาที่เหมาะสม ≈ <b>'+tf.toFixed(1)+' เดือน</b> (ช่วง '+(F/(.01*w)/4.345).toFixed(1)+'–'+(F/(.005*w)/4.345).toFixed(1)+' เดือน ที่ 0.5–1% ของน้ำหนักตัวต่อสัปดาห์) • ลดไขมัน ≈ '+(wkF).toFixed(2)+' kg/สัปดาห์');
+    if(mo){const r=F/(mo*4.345),p=r/w*100,df=F*7700/(mo*30.4),pd=df/i.tdee*100,kt=i.tdee-df;
+      v=p<=.5?['g','ช้าแต่ปลอดภัย']:p<=1?['g','เหมาะสม']:p<=1.25?['y','เร็วเกินไป เสี่ยงเสียกล้ามเนื้อ']:['r','ไม่แนะนำ — เร็วเกินไป'];
+      ls.push('แผนของคุณ ('+mo+' เดือน): ลด '+r.toFixed(2)+' kg/สัปดาห์ = '+p.toFixed(2)+'% ของน้ำหนักตัว/สัปดาห์');
+      ls.push('ต้องลดพลังงาน ≈ '+Math.round(df)+' kcal/วัน ('+Math.round(pd)+'% ของ TDEE) → กิน ≈ '+Math.round(kt)+' kcal/วัน'+(kt<fl?' ⚠ ต่ำกว่าขั้นต่ำที่ปลอดภัย '+fl+' kcal':pd>25?' ⚠ ขาดดุลเกิน 25%':''));
+      if(kt<fl&&v[0]!=='r')v=['r','ไม่แนะนำ — พลังงานต่ำเกินไป'];}
+    else v=['g','คำนวณตามอัตราแนะนำ'];
+    if(mx!==null&&F>mx){ls.push('⚠ ไขมันที่ลดได้สูงสุดก่อนถึงไขมันขั้นต่ำ ≈ '+Math.max(0,mx).toFixed(1)+' kg');v=['r','เกินไขมันที่มีอยู่'];}
+    out.push(blk('🔻 ลดไขมัน '+F+' kg',bd(v[1],v[0]),ls));}
+  if(M){const ls=[],sp={beginner:['10–15%',.125],mid:['8–10%',.09],adv:['≈5%',.05]}[ex];let v;
+    ls.push('ระยะเวลาที่เหมาะสม ≈ <b>'+tm.toFixed(1)+' เดือน</b> (ช่วง '+(M/RT[2]).toFixed(1)+'–'+(M/RT[0]).toFixed(1)+' เดือน) • อัตราสร้างกล้ามเนื้อที่เป็นไปได้ ≈ '+RT[0].toFixed(2)+'–'+RT[2].toFixed(2)+' kg/เดือน');
+    if(mo){const nd=M/mo;v=nd<=RT[1]?['g','เหมาะสม']:nd<=RT[2]?['y','ท้าทาย ต้องฝึกและกินอย่างเคร่งครัด']:['r','เกินกว่าที่ร่างกายสร้างได้จริง'];ls.push('แผนของคุณ ('+mo+' เดือน): ต้องเพิ่ม '+nd.toFixed(2)+' kg/เดือน');}else v=['g','คำนวณตามอัตราแนะนำ'];
+    ls.push('Lean bulk: กินเกิน TDEE '+sp[0]+' ≈ '+Math.round(i.tdee*(1+sp[1]))+' kcal/วัน • โปรตีน 1.8–2.2 g/กก. • เทรนแรงต้านสม่ำเสมอ');
+    out.push(blk('🔺 เพิ่มกล้ามเนื้อ '+M+' kg',bd(v[1],v[0]),ls));}
+  let T=F&&M?0:(F?tf:tm),mode='';
+  if(F&&M){const rec=ex==='beginner'||(fm&&i.bf>=(i.male?25:32));
+    if(rec){T=Math.max(tf*1.3,tm);mode='recomp';out.push(blk('🔁 ทำพร้อมกัน (Recomposition)',bd('ทำได้','g'),['เหมาะกับมือใหม่ ผู้กลับมาเทรน หรือคนที่ไขมันสูง','ขาดดุลเบา ๆ ≈ 10% ของ TDEE ('+Math.round(i.tdee*.9)+' kcal) โปรตีน 2.2 g/กก. เทรนแรงต้านหนักพอ','ระยะเวลารวม ≈ <b>'+T.toFixed(1)+' เดือน</b>']));}
+    else{T=tf+tm;mode='seq';out.push(blk('➡️ แนะนำทำทีละช่วง',bd('เหมาะสมกว่า','y'),['ถ้าไขมันไม่สูงมากหรือมีประสบการณ์เทรน การลดไขมันและสร้างกล้ามเนื้อพร้อมกันทำได้ช้าและไม่มีประสิทธิภาพ','ช่วง 1: ลดไขมัน '+tf.toFixed(1)+' เดือน → ช่วง 2: Lean bulk '+tm.toFixed(1)+' เดือน','ระยะเวลารวม ≈ <b>'+T.toFixed(1)+' เดือน</b>']));}}
+  const N=Math.max(1,Math.ceil(T)),lab=[],Wt=[],Bf=[];
+  for(let t=0;t<=N;t++){const tt=Math.min(t,T);let f=0,m=0;
+    if(mode==='recomp'){f=F*Math.min(1,tt/T);m=M*Math.min(1,tt/T);}else if(mode==='seq'){f=F*Math.min(1,tt/tf);m=M*Math.max(0,Math.min(1,(tt-tf)/tm));}else if(F)f=F*Math.min(1,tt/tf);else m=M*Math.min(1,tt/tm);
+    lab.push('เดือน '+t);Wt.push(+(w-f+m).toFixed(1));if(fm)Bf.push(+((fm-f)/(w-f+m)*100).toFixed(1));}
+  const endW=Wt[N],dt=new Date(Date.now()+T*30.4*864e5).toLocaleDateString('th-TH',{month:'long',year:'numeric'});
+  out.push(blk('📅 สรุปแผนที่แนะนำ','',['ใช้เวลา ≈ <b>'+T.toFixed(1)+' เดือน</b> (ถึง '+dt+') • น้ำหนักปลายทาง ≈ '+endW+' kg'+(fm?' • ไขมันประมาณ '+Bf[N]+'%':'')]));
+  gOut.innerHTML=out.join('');
+  const ax={ticks:{color:'#7A786F'},grid:{color:'#E2D8B8'}},lg={labels:{color:'#4A4944',boxWidth:14,font:{family:'Anuphan',size:13}}};
+  mk('cGoal',{type:'line',data:{labels:lab,datasets:[{label:'น้ำหนัก (kg)',data:Wt,borderColor:'#E8A200',backgroundColor:'#E8A200',tension:.3,yAxisID:'y'}].concat(fm?[{label:'ไขมัน (%)',data:Bf,borderColor:'#7A786F',backgroundColor:'#7A786F',tension:.3,yAxisID:'y1'}]:[])},options:{responsive:true,plugins:{legend:lg},scales:{x:ax,y:ax,y1:{ticks:ax.ticks,grid:{drawOnChartArea:false},position:'right'}}}});}
 function copyDaily(sid){const s=sid?db.sessions.find(z=>z.id===sid):curSess();if(!s)return;const c=C()||{};
   const t='Biggy Trainer — รายงานประจำวัน\nลูกค้า: '+(c.name||'')+'\nวันที่: '+s.date+'\n\n'+s.items.map(i=>'• '+i.ex+': '+i.sets.map(x=>(x.w||'BW')+'×'+x.r+(x.f?'('+FL[x.f]+')':'')).join(', ')+(i.tech?' | '+TN[i.tech]:'')+(i.rir?' | RIR '+i.rir:'')+(i.rpe?' | RPE '+i.rpe:'')+(i.plan?'\n  แพลนครั้งหน้า: '+PL[i.plan]:'')).join('\n')+(s.report?'\n\nสรุป: '+s.report:'');
   try{navigator.clipboard.writeText(t).then(()=>alert('คัดลอกรายงานแล้ว'),()=>prompt('คัดลอกข้อความรายงาน',t));}catch(e){prompt('คัดลอกข้อความรายงาน',t);}}
@@ -1030,10 +1126,11 @@ const bestORM=i=>Math.max.apply(null,i.sets.map(orm));
 /* ===== RENDER ===== */
 function tab(t){
   document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
-  ['dash','report','train','body','hist','client'].forEach(x=>document.getElementById('p-'+x).classList.toggle('hide',x!==t));
+  ['dash','report','train','body','hist','nutri','client'].forEach(x=>document.getElementById('p-'+x).classList.toggle('hide',x!==t));
   document.querySelectorAll('#bnav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
   scrollTo({top:0});if(t==='train')syncRollers();
   if(t==='report') renderReportCharts();
+  if(t==='nutri')loadNutri();
 }
 
 function render(){
